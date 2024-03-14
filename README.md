@@ -1,9 +1,8 @@
 # \[Group name\]
 
 **Group members:**
-- A
-- B
-- C
+- Martin Nordestgaard
+- Simon Morits Andersen
 
 This repository contains  
 1. Inaugural project. 
