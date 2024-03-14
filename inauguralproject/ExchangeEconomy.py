@@ -1,7 +1,8 @@
 from types import SimpleNamespace
+import numpy as np
 
 class ExchangeEconomyClass:
-
+    #Define parameters:
     def __init__(self):
 
         par = self.par = SimpleNamespace()
@@ -14,18 +15,21 @@ class ExchangeEconomyClass:
         par.w1A = 0.8
         par.w2A = 0.3
 
+    #Define utility functions: 
     def utility_A(self,x1A,x2A):
-        pass
-
+        return(x1A**self.par.alpha)*x2A**(1-self.par.alpha)
+    
     def utility_B(self,x1B,x2B):
-        pass
+        return(x1B**(self.par.beta)*x2B**(1-self.par.beta))
 
+    #Define demand functions:
     def demand_A(self,p1):
-        pass
+        return(self.alpha((p1*w1A+p2*w2A)/p1))
 
     def demand_B(self,p1):
-        pass
+        return(self.beta((p1*w1B+p2*w2B)/p1))
 
+    #Finding market clearing:
     def check_market_clearing(self,p1):
 
         par = self.par
