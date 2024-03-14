@@ -3,7 +3,6 @@
 **Group members:**
 - Martin Nordestgaard
 - Simon Morits Andersen
-- Test
 
 This repository contains  
 1. Inaugural project. 
