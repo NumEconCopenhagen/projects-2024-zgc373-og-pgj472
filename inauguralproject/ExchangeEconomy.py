@@ -22,7 +22,7 @@ class ExchangeEconomyClass:
         return(x1A**self.par.alpha)*x2A**(1-self.par.alpha)
     
     def utility_B(self,x1B,x2B):
-        return(x1B**(self.par.beta)*x2B**(1-self.par.beta))
+        return(x1B**(self.par.beta))*(x2B**(1-self.par.beta))
 
     #Define demand functions:
     def demand_A(self,p1,p2):
