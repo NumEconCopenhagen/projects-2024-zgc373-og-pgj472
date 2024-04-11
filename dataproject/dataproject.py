@@ -41,7 +41,7 @@ class StockData:
         for ticker, data in self.data.items():
             if ticker in self.tickers:  # Check if the ticker is in the list of valid tickers
                 if data is not None:
-                expected_returns[ticker] = data['Daily Return'].mean()
+                    expected_returns[ticker] = data['Daily Return'].mean()
         
         return expected_returns
 
@@ -104,4 +104,37 @@ class StockData:
         
         # Return the DataFrame containing expected returns
         return df_expected_returns
-        
+
+    def calculate_covariance(self):
+        # Extract daily returns for the selected stocks
+        daily_returns = {}
+        for ticker, data in self.data.items():
+            if ticker in self.tickers and data is not None:
+                daily_returns[ticker] = data['Daily Return']
+
+        # Create a DataFrame containing the daily returns for the selected stocks
+        df = pd.DataFrame(daily_returns)
+
+        # Calculate covariance matrix
+        covariance_matrix = df.cov()
+
+        return covariance_matrix
+
+    def two_stocks_covariance(self):
+        # Define the two stocks
+        two_stocks = ['AAPL', 'CVX']
+        covariance_matrix = self.calculate_covariance()
+        return covariance_matrix.loc[two_stocks, two_stocks]
+
+    def four_stocks_covariance(self):
+        # Define the four stocks
+        four_stocks = ['AAPL', 'CVX', 'KO', 'MCD']
+        covariance_matrix = self.calculate_covariance()
+        return covariance_matrix.loc[four_stocks, four_stocks]
+
+    def six_stocks_covariance(self):
+        # Define the six stocks
+        six_stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
+        covariance_matrix = self.calculate_covariance()
+        return covariance_matrix.loc[six_stocks, six_stocks]
+
