@@ -80,6 +80,16 @@ class StockData:
         return df
 
     def expected_return_(self):
+        # Mapping of ticker symbols to company names
+        company_names = {
+        "AAPL": "Apple Inc.",
+        "CVX": "Chevron Corporation",
+        "KO": "The Coca-Cola Company",
+        "MCD": "McDonald's Corporation",
+        "BAC": "Bank of America Corporation",
+        "NKE": "Nike, Inc."
+        }
+        
         # Calculate expected returns
         expected_returns = self.calculate_expected_returns()
 
