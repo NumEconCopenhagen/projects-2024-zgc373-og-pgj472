@@ -102,8 +102,14 @@ class StockData:
         # Set the Ticker column as index
         df_expected_returns.set_index('Ticker', inplace=True)
         
+        # Filter out unwanted ticker symbols
+        expected_returns_df_filtered = df_expected_returns[~df_expected_returns.index.isin(["A", "P", "L"])]
+
+        # Replace index labels (ticker symbols) with company names
+        expected_returns_df_filtered.index = expected_returns_df_filtered.index.map(company_names)
+
         # Return the DataFrame containing expected returns
-        return df_expected_returns
+        return expected_returns_df_filtered
 
     def calculate_covariance(self):
         # Extract daily returns for the selected stocks
@@ -137,4 +143,23 @@ class StockData:
         six_stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
         covariance_matrix = self.calculate_covariance()
         return covariance_matrix.loc[six_stocks, six_stocks]
+
+    def calculate_invers_covariance(self, number):
+        if number == "two":
+            # Calculate covariance matrix
+            covariance_matrix = self.two_stocks_covariance()
+        elif number == "four":
+            # Calculate covariance matrix
+            covariance_matrix = self.four_stocks_covariance()
+        elif number == "six":
+            # Calculate covariance matrix
+            covariance_matrix = self.six_stocks_covariance()
+    
+        # Calculate inverse covariance matrix
+        invers_covariance_matrix = np.linalg.inv(covariance_matrix)
+
+        invers_covariance_matrix = pd.DataFrame(invers_covariance_matrix)
+    
+        return invers_covariance_matrix
+
 
