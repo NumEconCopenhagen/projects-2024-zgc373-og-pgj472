@@ -146,20 +146,77 @@ class StockData:
 
     def calculate_invers_covariance(self, number):
         if number == "two":
+            # Define the two stocks
+            stocks = ['AAPL', 'CVX']
             # Calculate covariance matrix
             covariance_matrix = self.two_stocks_covariance()
         elif number == "four":
+            # Define the four stocks
+            stocks = ['AAPL', 'CVX', 'KO', 'MCD']
             # Calculate covariance matrix
             covariance_matrix = self.four_stocks_covariance()
         elif number == "six":
+            # Define the six stocks
+            stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
             # Calculate covariance matrix
             covariance_matrix = self.six_stocks_covariance()
-    
+
         # Calculate inverse covariance matrix
         invers_covariance_matrix = np.linalg.inv(covariance_matrix)
 
-        invers_covariance_matrix = pd.DataFrame(invers_covariance_matrix)
-    
+        # Convert the inverse covariance matrix into a DataFrame with the stock names as the column and row names
+        invers_covariance_matrix = pd.DataFrame(invers_covariance_matrix, columns=stocks, index=stocks)
+
         return invers_covariance_matrix
 
+    def one_vector(self, number):
+        if number == "two":
+            # Define the two stocks
+            stocks = ['AAPL', 'CVX']
+        elif number == "four":
+            # Define the four stocks
+            stocks = ['AAPL', 'CVX', 'KO', 'MCD']
+        elif number == "six":
+            # Define the six stocks
+            stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
 
+        # Create a 1-vector with the same length as the number of stocks
+        one_vector = np.ones((len(stocks), 1))
+
+        return one_vector
+
+    def calculate_z_vector(self, number):
+        # Get the inverse covariance matrix
+        invers_covariance_matrix = self.calculate_invers_covariance(number)
+
+        # Get the 1-vector
+        one_vector = self.one_vector(number)
+
+        # Calculate the z-vector
+        z_vector = np.dot(invers_covariance_matrix, one_vector)
+
+        return z_vector
+
+    def normalize_z_vector(self, number):
+        # Get the z-vector
+        z_vector = self.calculate_z_vector(number)
+
+        # Calculate the sum of the z-vector
+        z_sum = np.sum(z_vector)
+
+        # Normalize the z-vector
+        normalized_z_vector = z_vector / z_sum
+
+        return normalized_z_vector
+    
+    def check_results(self, number):
+        # Get the covariance matrix
+        covariance_matrix = self.calculate_covariance(number)
+
+        # Get the z-vector
+        z_vector = self.calculate_z_vector(number)
+
+        # Multiply the covariance matrix by the z-vector
+        result = np.dot(covariance_matrix, z_vector)
+
+        return result
