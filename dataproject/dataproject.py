@@ -111,7 +111,7 @@ class StockData:
         # Return the DataFrame containing expected returns
         return expected_returns_df_filtered
 
-    def calculate_covariance(self):
+    def calculate_covariance(self, number):
         # Extract daily returns for the selected stocks
         daily_returns = {}
         for ticker, data in self.data.items():
@@ -124,42 +124,37 @@ class StockData:
         # Calculate covariance matrix
         covariance_matrix = df.cov()
 
+        if number == "two":
+            # Define the two stocks
+            two_stocks = ['AAPL', 'CVX']
+            covariance_matrix = covariance_matrix.loc[two_stocks, two_stocks]
+        elif number == "four":
+            # Define the four stocks
+            four_stocks = ['AAPL', 'CVX', 'KO', 'MCD']
+            covariance_matrix = covariance_matrix.loc[four_stocks, four_stocks]
+        elif number == "six":
+            # Define the six stocks
+            six_stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
+            covariance_matrix = covariance_matrix.loc[six_stocks, six_stocks]
+
         return covariance_matrix
-
-    def two_stocks_covariance(self):
-        # Define the two stocks
-        two_stocks = ['AAPL', 'CVX']
-        covariance_matrix = self.calculate_covariance()
-        return covariance_matrix.loc[two_stocks, two_stocks]
-
-    def four_stocks_covariance(self):
-        # Define the four stocks
-        four_stocks = ['AAPL', 'CVX', 'KO', 'MCD']
-        covariance_matrix = self.calculate_covariance()
-        return covariance_matrix.loc[four_stocks, four_stocks]
-
-    def six_stocks_covariance(self):
-        # Define the six stocks
-        six_stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
-        covariance_matrix = self.calculate_covariance()
-        return covariance_matrix.loc[six_stocks, six_stocks]
 
     def calculate_invers_covariance(self, number):
         if number == "two":
             # Define the two stocks
             stocks = ['AAPL', 'CVX']
             # Calculate covariance matrix
-            covariance_matrix = self.two_stocks_covariance()
+            covariance_matrix = self.calculate_covariance("two")
         elif number == "four":
             # Define the four stocks
             stocks = ['AAPL', 'CVX', 'KO', 'MCD']
             # Calculate covariance matrix
-            covariance_matrix = self.four_stocks_covariance()
+            covariance_matrix = self.calculate_covariance("four")
         elif number == "six":
             # Define the six stocks
             stocks = ['AAPL', 'CVX', 'KO', 'MCD', 'BAC', 'NKE']
             # Calculate covariance matrix
-            covariance_matrix = self.six_stocks_covariance()
+            covariance_matrix = self.calculate_covariance("six")
 
         # Calculate inverse covariance matrix
         invers_covariance_matrix = np.linalg.inv(covariance_matrix)
