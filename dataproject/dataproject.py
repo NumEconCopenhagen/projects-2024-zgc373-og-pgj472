@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -90,26 +91,18 @@ class StockData:
         "NKE": "Nike, Inc."
         }
         
-        # Calculate expected returns
         expected_returns = self.calculate_expected_returns()
-
-        # Convert expected returns to percentages
         expected_returns_percentage = {ticker: expected_return * 100 for ticker, expected_return in expected_returns.items()}
-
-        # Create a DataFrame for expected returns
         df_expected_returns = pd.DataFrame(expected_returns_percentage.items(), columns=['Ticker', 'Expected Return (%)'])
-
-        # Set the Ticker column as index
         df_expected_returns.set_index('Ticker', inplace=True)
         
-        # Filter out unwanted ticker symbols
         expected_returns_df_filtered = df_expected_returns[~df_expected_returns.index.isin(["A", "P", "L"])]
-
-        # Replace index labels (ticker symbols) with company names
         expected_returns_df_filtered.index = expected_returns_df_filtered.index.map(company_names)
 
-        # Return the DataFrame containing expected returns
+        self.expected_returns_df_filtered = expected_returns_df_filtered
+
         return expected_returns_df_filtered
+
 
     def calculate_covariance(self, number):
         # Extract daily returns for the selected stocks
@@ -215,4 +208,4 @@ class StockData:
         result = np.dot(covariance_matrix, z_vector)
 
         return result
-    # New text
+    
