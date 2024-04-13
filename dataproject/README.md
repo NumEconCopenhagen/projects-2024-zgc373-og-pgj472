@@ -16,7 +16,7 @@ However, it's essential to note that while diversification can mitigate certain 
 
 In this project we therefore are seeking to show this concept by recreating the Efficient Frontier for the companies chosen. We illustrate by showing the difference in expected return and volatility (standard deviation) for the case of only two stocks, then four stocks, and finally six stocks in a portfolio.
 
-Our method and calculations are taken from chapter 11 “Optimal Portfolio Choice and the Capital Asset Pricing Model” in Corporate Finance by Jonathan Berk and Peter DeMarzo along with “Lecture Notes on Asset Pricing” by Peter Norman Sørensen (Department of Economics, UCPA). 
+Our method and calculations are taken from chapter 11 “Optimal Portfolio Choice and the Capital Asset Pricing Model” in Corporate Finance by Jonathan Berk and Peter DeMarzo (2020) along with “Lecture Notes on Asset Pricing” by Peter Norman Sørensen (Department of Economics, UCPA). 
 
 We have imported and used stock data for the closing price of the six companies in the period between January 1. 2017, to April 4. 2024. To recreate and test the theory we show three different portfolios consisting of two (AAPL and CVX), four (AAPL, CVX, KO and JNJ) and six (AAPL, CVX, KO, JNJ, BAC and NKE) stocks.
 
