@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 
 # We start by creating a class called cournot which will be used to create our functions
 class cournot:
+
+    # Define the parameters
+    a = 5
+    b = 1
+    MC = 1
+
     # We define the cost function:
     def cost_function(self, qi, MC):
         return MC * qi
@@ -45,5 +51,4 @@ class cournot:
     # We define the total quantity produced in equilibrium:
     def total_equilibrium_quantity(self, a, b, MC):
         return 2 * (a - MC) / (3 * b)
-    
     
