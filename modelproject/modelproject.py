@@ -37,3 +37,13 @@ class cournot:
     # We define the best response function for firm 2:
     def br2(self, q1, a, b, MC):
         return (a - MC) / (2 * b) - q1 / 2
+    
+    # We define the Cournot-Nash equilibrium quantity for each firm:
+    def equilibrium_quantity(self, a, b, MC):
+        return (a - MC) / (3 * b)
+
+    # We define the total quantity produced in equilibrium:
+    def total_equilibrium_quantity(self, a, b, MC):
+        return 2 * (a - MC) / (3 * b)
+    
+    
