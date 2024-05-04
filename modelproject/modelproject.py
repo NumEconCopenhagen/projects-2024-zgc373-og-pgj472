@@ -1,22 +1,10 @@
+# imports for the model project:
 from scipy import optimize
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-def solve_ss(alpha, c):
-    """ Example function. Solve for steady state k. 
-
-    Args:
-        c (float): costs
-        alpha (float): parameter
-
-    Returns:
-        result (RootResults): the solution represented as a RootResults object.
-
-    """ 
+# We start by creating a class called cournot which will be used to create our functions
+class cournot:
+    # We define the cost function:
     
-    # a. Objective function, depends on k (endogenous) and c (exogenous).
-    f = lambda k: k**alpha - c
-    obj = lambda kss: kss - f(kss)
-
-    #. b. call root finder to find kss.
-    result = optimize.root_scalar(obj,bracket=[0.1,100],method='bisect')
-    
-    return result
