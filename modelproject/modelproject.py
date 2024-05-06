@@ -8,18 +8,22 @@ import ipywidgets as widgets
 import sympy as sm
 from scipy.optimize import fsolve
 
-# We start by creating a class called Parameters which will be used to store the parameters of the model
-class Parameters:
+# We start by creating a class called parameters which will be used to store the parameters of the model
+class parameters:
     def __init__(self, a, b, MC):
         self.a = a
         self.b = b
         self.MC = MC
 
 # We start by creating a class called cournot which will be used to create our functions
-class cournot:
+class duopoly_model:
 
     def __init__(self, a, b, MC):
-        self.par = Parameters(a, b, MC)
+        self.par = parameters(a, b, MC)
+        self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
+        self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
+        self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+        widgets.interact(self.update_plot, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
 
     # We define the cost function:
     def cost_function(self, qi):
@@ -61,56 +65,51 @@ class cournot:
     def total_equilibrium_quantity(self):
         return 2 * (self.par.a - self.par.MC) / (3 * self.par.b)
     
-
-# We define a class called CournotPlotter which will be used to create the interactive plot
-class CournotPlotter:
-    def __init__(self, cournot_model):
-        self.model = cournot_model
-        self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
-        self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
-        self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
-        widgets.interact(self.update_plot, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
-
-
     def update_plot(self, a, b, MC):
-        self.model.par.a = a
-        self.model.par.b = b
-        self.model.par.MC = MC
+        self.par.a = a
+        self.par.b = b
+        self.par.MC = MC
 
         q = np.linspace(0, 10, 100)
-        br1 = [self.model.br1(qi) for qi in q]
-        br2 = [self.model.br2(qi) for qi in q]
-        eq_q1 = self.model.equilibrium_quantity()
-        eq_q2 = self.model.equilibrium_quantity()
+        br1 = [self.br1(qi) for qi in q]
+        br2 = [self.br2(qi) for qi in q]
+        eq_q1d = self.equilibrium_quantity()
+        eq_q2d = self.equilibrium_quantity()
 
         # Calculate the price in equilibrium
-        eq_Q = eq_q1 + eq_q2
-        eq_p = a - b * eq_Q
+        eq_Qd = eq_q1d + eq_q2d
+        eq_pd = a - b * eq_Qd
 
         # Calculate the profits in equilibrium
-        eq_profit1 = eq_p * eq_q1 - MC * eq_q1
-        eq_profit2 = eq_p * eq_q2 - MC * eq_q2
+        eqd_profit1 = eq_pd * eq_q1d - MC * eq_q1d
+        eqd_profit2 = eq_pd * eq_q2d - MC * eq_q2d
 
         plt.figure(figsize=(8, 8))
         plt.plot(q, br1, label='Best Response Firm 1')
         plt.plot(br2, q, label='Best Response Firm 2')
-        plt.scatter(eq_q1, eq_q2, color='red', label='Equilibrium quantity')
+        plt.scatter(eq_q1d, eq_q2d, color='red', label='Cournot-Nash Equilibrium')
         plt.xlabel('Quantity produced by Firm 1 (q1)')
         plt.ylabel('Quantity produced by Firm 2 (q2)')
         plt.legend()
         plt.show()
 
-        print("Quantity produced by firm 1 in equilibrium:", eq_q1)
-        print("Quantity produced by firm 2 in equilibrium:", eq_q2)
-        print("Price in equilibrium:", eq_p)  
-        print("Profit for firm 1 in equilibrium:", eq_profit1)  
-        print("Profit for firm 2 in equilibrium:", eq_profit2) 
+        print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity())
+        print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity())
+        print("Total quantity produced in equilibrium:", self.total_equilibrium_quantity())
+        print("Price in equilibrium:", eq_pd)  # Print the price in equilibrium
+        print("Profit for firm 1 in equilibrium:", eqd_profit1)  # Print the profit for firm 1 in equilibrium  
+        print("Profit for firm 2 in equilibrium:", eqd_profit2)  # Print the profit for firm 2 in equilibrium
 
 
-class Monopoly:
+class monopoly_model:
 
     def __init__(self, a, b, MC):
-        self.par = Parameters(a, b, MC)
+        self.par = parameters(a, b, MC)
+        self.par = parameters(a, b, MC)
+        self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
+        self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
+        self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+        widgets.interact(self.calculate_values, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
 
     # We define the cost function:
     def cost_function(self, Q):
@@ -138,3 +137,17 @@ class Monopoly:
     def monopoly_profit(self):
         Q = self.monopoly_quantity()
         return self.profit_function(Q)
+    
+    def calculate_values(self, a, b, MC):
+        self.par.a = a
+        self.par.b = b
+        self.par.MC = MC
+
+        # Calculate the monopoly quantity, price, and profit
+        monopoly_q = self.monopoly_quantity()
+        monopoly_p = self.monopoly_price()
+        monopoly_profit = self.monopoly_profit()
+
+        print("Quantity produced under monopoly is:", monopoly_q)
+        print("Price in monopoly:", monopoly_p)
+        print("Profit for monopoly:", monopoly_profit)
