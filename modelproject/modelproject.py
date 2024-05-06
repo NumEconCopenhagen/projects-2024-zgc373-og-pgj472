@@ -65,6 +65,10 @@ class duopoly_model:
     def total_equilibrium_quantity(self):
         return 2 * (self.par.a - self.par.MC) / (3 * self.par.b)
     
+    # Calculate and return the equilibrium price
+    def equilibrium_price(self):       
+        return self.par.a - self.par.b * self.equilibrium_quantity()
+    
     def update_plot(self, a, b, MC):
         self.par.a = a
         self.par.b = b
@@ -151,3 +155,41 @@ class monopoly_model:
         print("Quantity produced under monopoly is:", monopoly_q)
         print("Price in monopoly:", monopoly_p)
         print("Profit for monopoly:", monopoly_profit)
+
+
+class plotcomparison:
+
+    def __init__(self, monopoly_model, duopoly_model):
+        self.monopoly_model = monopoly_model
+        self.duopoly_model = duopoly_model
+
+    def calculate_values(self, a, b, MC):
+        self.monopoly_model.par.a = a
+        self.monopoly_model.par.b = b
+        self.monopoly_model.par.MC = MC
+        self.duopoly_model.par.a = a
+        self.duopoly_model.par.b = b
+        self.duopoly_model.par.MC = MC
+
+    def plot(self, a, b, MC):
+        self.calculate_values(a, b, MC)
+
+        # Calculate the monopoly quantity, price, and profit
+        monopoly_q = self.monopoly_model.monopoly_quantity()
+        monopoly_p = self.monopoly_model.monopoly_price()
+
+        # Calculate the duopoly quantities, price, and profits
+        duopoly_q1 = self.duopoly_model.equilibrium_quantity()
+        duopoly_q2 = self.duopoly_model.equilibrium_quantity()
+        duopoly_p = self.duopoly_model.equilibrium_price()
+
+        # Plot the quantities and prices
+        plt.figure(figsize=(8, 8))
+        plt.plot([monopoly_q, duopoly_q1 + duopoly_q2], [monopoly_p, duopoly_p], marker='o')
+        plt.xlabel('Quantity')
+        plt.ylabel('Price')
+        plt.title('Price vs Quantity for Monopoly and Duopoly')
+        plt.legend(['Monopoly', 'Duopoly'])
+        plt.grid(True)
+        plt.show()
+
