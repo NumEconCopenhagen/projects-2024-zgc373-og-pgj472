@@ -4,19 +4,22 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from types import SimpleNamespace
+import ipywidgets as widgets
+import sympy as sm
+from scipy.optimize import fsolve
+
+# We start by creating a class called Parameters which will be used to store the parameters of the model
+class Parameters:
+    def __init__(self, a, b, MC):
+        self.a = a
+        self.b = b
+        self.MC = MC
 
 # We start by creating a class called cournot which will be used to create our functions
 class cournot:
 
-    # Define parameters:
-    def __init__(self):
-
-        par = self.par = SimpleNamespace()
-
-        # parameters:
-        par.a = 30
-        par.b = 2
-        par.MC = 5
+    def __init__(self, a, b, MC):
+        self.par = Parameters(a, b, MC)
 
     # We define the cost function:
     def cost_function(self, qi):
@@ -58,5 +61,50 @@ class cournot:
     def total_equilibrium_quantity(self):
         return 2 * (self.par.a - self.par.MC) / (3 * self.par.b)
     
+
+# We define a class called CournotPlotter which will be used to create the interactive plot
+class CournotPlotter:
+    def __init__(self, cournot_model):
+        self.model = cournot_model
+        self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
+        self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
+        self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+        widgets.interact(self.update_plot, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
+
+
+    def update_plot(self, a, b, MC):
+        self.model.par.a = a
+        self.model.par.b = b
+        self.model.par.MC = MC
+
+        q = np.linspace(0, 10, 100)
+        br1 = [self.model.br1(qi) for qi in q]
+        br2 = [self.model.br2(qi) for qi in q]
+        eq_q1 = self.model.equilibrium_quantity()
+        eq_q2 = self.model.equilibrium_quantity()
+
+        # Calculate the price in equilibrium
+        eq_Q = eq_q1 + eq_q2
+        eq_p = a - b * eq_Q
+
+        # Calculate the profits in equilibrium
+        eq_profit1 = eq_p * eq_q1 - MC * eq_q1
+        eq_profit2 = eq_p * eq_q2 - MC * eq_q2
+
+        plt.figure(figsize=(8, 8))
+        plt.plot(q, br1, label='Best Response Firm 1')
+        plt.plot(br2, q, label='Best Response Firm 2')
+        plt.scatter(eq_q1, eq_q2, color='red', label='Equilibrium quantity')
+        plt.xlabel('Quantity produced by Firm 1 (q1)')
+        plt.ylabel('Quantity produced by Firm 2 (q2)')
+        plt.legend()
+        plt.show()
+
+        print("Quantity produced by firm 1 in equilibrium:", eq_q1)
+        print("Quantity produced by firm 2 in equilibrium:", eq_q2)
+        print("Price in equilibrium:", eq_p)  
+        print("Profit for firm 1 in equilibrium:", eq_profit1)  
+        print("Profit for firm 2 in equilibrium:", eq_profit2) 
+
 
 
