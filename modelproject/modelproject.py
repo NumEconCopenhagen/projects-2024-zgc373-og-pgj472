@@ -107,4 +107,34 @@ class CournotPlotter:
         print("Profit for firm 2 in equilibrium:", eq_profit2) 
 
 
+class Monopoly:
 
+    def __init__(self, a, b, MC):
+        self.par = Parameters(a, b, MC)
+
+    # We define the cost function:
+    def cost_function(self, Q):
+        return self.par.MC * Q
+
+    # We define the profit function for the monopoly:
+    def profit_function(self, Q):
+        p = self.par.a - self.par.b * Q
+        return p * Q - self.cost_function(Q)
+
+    # We define the first order condition for the monopoly:
+    def foc(self, Q):
+        return self.par.a - 2 * self.par.b * Q - self.par.MC
+
+    # We define the monopoly quantity:
+    def monopoly_quantity(self):
+        return (self.par.a - self.par.MC) / (2 * self.par.b)
+
+    # We define the monopoly price:
+    def monopoly_price(self):
+        Q = self.monopoly_quantity()
+        return self.par.a - self.par.b * Q
+
+    # We define the monopoly profit:
+    def monopoly_profit(self):
+        Q = self.monopoly_quantity()
+        return self.profit_function(Q)
