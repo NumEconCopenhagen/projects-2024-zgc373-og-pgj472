@@ -23,6 +23,9 @@ class duopoly_model:
         self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
         self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
         self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+    
+    # Add a new method for the interactive plot    
+    def interactive_plot(self):    
         widgets.interact(self.update_plot, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
 
     # We define the cost function:
@@ -58,16 +61,19 @@ class duopoly_model:
         return (self.par.a - self.par.MC) / (2 * self.par.b) - q1 / 2
     
     # We define the Cournot-Nash equilibrium quantity for each firm:
-    def equilibrium_quantity(self):
+    def equilibrium_quantity_firm1(self):
+        return (self.par.a - self.par.MC) / (3 * self.par.b)
+
+    def equilibrium_quantity_firm2(self):
         return (self.par.a - self.par.MC) / (3 * self.par.b)
 
     # We define the total quantity produced in equilibrium:
     def total_equilibrium_quantity(self):
-        return 2 * (self.par.a - self.par.MC) / (3 * self.par.b)
+        return self.equilibrium_quantity_firm1() + self.equilibrium_quantity_firm2()
     
     # Calculate and return the equilibrium price
     def equilibrium_price(self):       
-        return self.par.a - self.par.b * self.equilibrium_quantity()
+        return self.par.a - self.par.b * self.total_equilibrium_quantity()
     
     def update_plot(self, a, b, MC):
         self.par.a = a
@@ -77,11 +83,11 @@ class duopoly_model:
         q = np.linspace(0, 10, 100)
         br1 = [self.br1(qi) for qi in q]
         br2 = [self.br2(qi) for qi in q]
-        eq_q1d = self.equilibrium_quantity()
-        eq_q2d = self.equilibrium_quantity()
+        eq_q1d = self.equilibrium_quantity_firm1()
+        eq_q2d = self.equilibrium_quantity_firm2()
 
         # Calculate the price in equilibrium
-        eq_Qd = eq_q1d + eq_q2d
+        eq_Qd = self.total_equilibrium_quantity()
         eq_pd = a - b * eq_Qd
 
         # Calculate the profits in equilibrium
@@ -97,8 +103,8 @@ class duopoly_model:
         plt.legend()
         plt.show()
 
-        print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity())
-        print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity())
+        print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity_firm1())
+        print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity_firm2())
         print("Total quantity produced in equilibrium:", self.total_equilibrium_quantity())
         print("Price in equilibrium:", eq_pd)  # Print the price in equilibrium
         print("Profit for firm 1 in equilibrium:", eqd_profit1)  # Print the profit for firm 1 in equilibrium  
@@ -113,6 +119,9 @@ class monopoly_model:
         self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
         self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
         self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+    
+    # Add a new method for the interactive plot for monopoly
+    def interactive_plot_monopoly(self): 
         widgets.interact(self.calculate_values, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
 
     # We define the cost function:
@@ -179,8 +188,8 @@ class plotcomparison:
         monopoly_p = self.monopoly_model.monopoly_price()
 
         # Calculate the duopoly quantities, price, and profits
-        duopoly_q1 = self.duopoly_model.equilibrium_quantity()
-        duopoly_q2 = self.duopoly_model.equilibrium_quantity()
+        duopoly_q1 = self.duopoly_model.equilibrium_quantity_firm1()
+        duopoly_q2 = self.duopoly_model.equilibrium_quantity_firm2()
         duopoly_p = self.duopoly_model.equilibrium_price()
 
         # Plot the quantities and prices
