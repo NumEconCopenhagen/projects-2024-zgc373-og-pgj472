@@ -8,6 +8,7 @@ import ipywidgets as widgets
 import sympy as sm
 from scipy.optimize import fsolve
 from scipy.optimize import root
+from prettytable import PrettyTable
 
 # We start by creating a class called parameters which will be used to store the parameters of the model
 class parameters:
@@ -280,3 +281,21 @@ class monopoly_model_extension(duopoly_model):
         print("Price in equilibrium:", self.price_monopoly())  
         print("Profit per firm:", self.profit_per_firm(self.sol.Q))  
 
+    def print_results_table(self, duopoly_model_extension, monopoly_model_extension):
+        # Create a PrettyTable object
+        table = PrettyTable()
+
+        # Set the column names
+        table.field_names = ["", "Duopoly Extension Model", "Monopoly Extension Model"]
+
+        self.equilibrium_quantity_firm1() + self.equilibrium_quantity_firm2()
+
+        # Add rows for each metric
+        table.add_row(["Price", duopoly_model_extension.equilibrium_price(), monopoly_model_extension.price_monopoly()])
+        table.add_row(["Quantity Produced", duopoly_model_extension.equilibrium_quantity_firm1() + duopoly_model_extension.equilibrium_quantity_firm2(), monopoly_model_extension.equilibrium_quantity_monopoly()])
+        table.add_row(["Profit", duopoly_model_extension.profit_function1(2.083, 2.083), monopoly_model_extension.profit_per_firm(3.125)])
+        table.add_row(["Consumer Surplus", duopoly_model_extension.consumer_surplus_duo(), monopoly_model_extension.consumer_surplus_mon()])
+        table.add_row(["Producer Surplus", duopoly_model_extension.producer_surplus_duo(), monopoly_model_extension.producer_surplus_mon()])
+
+        # Print the table
+        print(table)
