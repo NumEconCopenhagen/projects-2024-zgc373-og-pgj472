@@ -109,16 +109,107 @@ class duopoly_model:
         print("Price in equilibrium:", eq_pd)  # Print the price in equilibrium
         print("Profit for firm 1 in equilibrium:", eqd_profit1)  # Print the profit for firm 1 in equilibrium  
         print("Profit for firm 2 in equilibrium:", eqd_profit2)  # Print the profit for firm 2 in equilibrium
+    
 
 
-class monopoly_model:
+class duopoly_model_extension(duopoly_model):
+    def __init__(self):
+        super().__init__(100, 16, 0)
+    
+    def cost_function(self, qi):
+        return 0
+
+    def profit_function1(self, q1, q2):
+        Q = q1 + q2
+        p = self.par.a - self.par.b * Q
+        return p * q1
+
+    def profit_function2(self, q1, q2):
+        Q = q1 + q2
+        p = self.par.a - self.par.b * Q
+        return p * q2
+
+    def foc1(self, q1, q2):
+        return self.par.a - 2 * self.par.b * q1 - self.par.b * q2
+
+    def foc2(self, q1, q2):
+        return self.par.a - self.par.b * q1 - 2 * self.par.b * q2
+
+    def br1(self, q2):
+        return self.par.a / (2 * self.par.b) - q2 / 2
+
+    def br2(self, q1):
+        return self.par.a / (2 * self.par.b) - q1 / 2
+
+    def equilibrium_quantity_firm1(self):
+        return self.par.a / (3 * self.par.b)
+
+    def equilibrium_quantity_firm2(self):
+        return self.par.a / (3 * self.par.b)
+
+    def update_plot(self):
+        super().update_plot(100, 16, 0)
+
+    def print_results(self, q1, q2):
+        print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity_firm1())
+        print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity_firm2())
+        print("Total quantity produced in equilibrium:", self.total_equilibrium_quantity())
+        print("Price in equilibrium:", self.equilibrium_price())  
+        print("Profit for firm 1 in equilibrium:", self.profit_function1(q1, q2))  
+        print("Profit for firm 2 in equilibrium:", self.profit_function2(q1, q2))  
+
+
+
+class monopoly_model_extension(duopoly_model):
+    def __init__(self):
+        super().__init__(100, 16, 0)
+    
+    def cost_function(self, qi):
+        return 0
+
+    def profit_function(self, Q_ex):
+        p = self.par.a - self.par.b * Q_ex
+        return p * Q_ex
+    
+    def profit_per_firm(self, Q_ex):
+        return self.profit_function(Q_ex) / 2
+
+    def foc(self, Q_ex):
+        return self.par.a - 2 * self.par.b * Q_ex
+
+    def equilibrium_quantity_monopoly(self):
+        return self.par.a / (2 * self.par.b)
+    
+    def quantity_per_firm(self):
+        return self.equilibrium_quantity_monopoly() / 2
+    
+    def price_monopoly(self):
+        return self.par.a - self.par.b * self.equilibrium_quantity_monopoly()
+
+    def update_plot(self):
+        super().update_plot(100, 16, 0)
+
+    def print_results(self, Q_ex):
+        print("Quantity produced per firm:", self.quantity_per_firm())
+        print("Total quantity produced::", self.equilibrium_quantity_monopoly())
+        print("Price in equilibrium:", self.price_monopoly())  
+        print("Profit per firm:", self.profit_per_firm(Q_ex))  
+
+
+
+
+
+
+
+
+#class monopoly_model_extension:
 
     def __init__(self, a, b, MC):
         self.par = parameters(a, b, MC)
         self.par = parameters(a, b, MC)
-        self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
-        self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
-        self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+        self.a_slider = widgets.FloatSlider(min=50, max=150, step=0.1, value=100, description='a:')
+        self.b_slider = widgets.FloatSlider(min=5, max=25, step=0.1, value=16, description='b:')
+        self.MC_slider = widgets.FloatSlider(min=0.5, max=5, step=0.1, value=4, description='MC:')
     
     # Add a new method for the interactive plot for monopoly
     def interactive_plot_monopoly(self): 
@@ -126,7 +217,7 @@ class monopoly_model:
 
     # We define the cost function:
     def cost_function(self, Q):
-        return self.par.MC * Q
+        return 0
 
     # We define the profit function for the monopoly:
     def profit_function(self, Q):
@@ -164,41 +255,4 @@ class monopoly_model:
         print("Quantity produced under monopoly is:", monopoly_q)
         print("Price in monopoly:", monopoly_p)
         print("Profit for monopoly:", monopoly_profit)
-
-
-class plotcomparison:
-
-    def __init__(self, monopoly_model, duopoly_model):
-        self.monopoly_model = monopoly_model
-        self.duopoly_model = duopoly_model
-
-    def calculate_values(self, a, b, MC):
-        self.monopoly_model.par.a = a
-        self.monopoly_model.par.b = b
-        self.monopoly_model.par.MC = MC
-        self.duopoly_model.par.a = a
-        self.duopoly_model.par.b = b
-        self.duopoly_model.par.MC = MC
-
-    def plot(self, a, b, MC):
-        self.calculate_values(a, b, MC)
-
-        # Calculate the monopoly quantity, price, and profit
-        monopoly_q = self.monopoly_model.monopoly_quantity()
-        monopoly_p = self.monopoly_model.monopoly_price()
-
-        # Calculate the duopoly quantities, price, and profits
-        duopoly_q1 = self.duopoly_model.equilibrium_quantity_firm1()
-        duopoly_q2 = self.duopoly_model.equilibrium_quantity_firm2()
-        duopoly_p = self.duopoly_model.equilibrium_price()
-
-        # Plot the quantities and prices
-        plt.figure(figsize=(8, 8))
-        plt.plot([monopoly_q, duopoly_q1 + duopoly_q2], [monopoly_p, duopoly_p], marker='o')
-        plt.xlabel('Quantity')
-        plt.ylabel('Price')
-        plt.title('Price vs Quantity for Monopoly and Duopoly')
-        plt.legend(['Monopoly', 'Duopoly'])
-        plt.grid(True)
-        plt.show()
 
