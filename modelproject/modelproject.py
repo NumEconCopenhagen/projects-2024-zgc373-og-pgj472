@@ -179,11 +179,15 @@ class duopoly_model_extension(duopoly_model):
         q = np.linspace(0, self.par.a / self.par.b, 100)  # range of quantities
         p_demand = self.par.a - self.par.b * q  # inverse demand function
         equilibrium_quantity = self.equilibrium_quantity_firm1() + self.equilibrium_quantity_firm2()  # equilibrium quantity
+        equilibrium_price = self.par.a - self.par.b * equilibrium_quantity  # equilibrium price
 
         plt.figure(figsize=(8, 6))
         plt.plot(q, p_demand, label='Demand')
         plt.axvline(x=equilibrium_quantity, color='r', linestyle='-', label='Supply')
-        plt.axhline(y=33.33, color='g', linestyle='--', label='Price at 33.33')  # horizontal line at price 50
+        plt.axhline(y=33.33, color='g', linestyle='--', label='Price at 33.33')  # horizontal line at price 33.33
+        plt.scatter(equilibrium_quantity, equilibrium_price, color='b')  # intersection point
+        plt.text(equilibrium_quantity + 0.20 * (self.par.a / self.par.b), equilibrium_price + 0.05 * self.par.a, 
+                f'({equilibrium_quantity:.2f}, {equilibrium_price:.2f})', horizontalalignment='right')  # text indicating the intersection point
         plt.xlabel('Quantity')
         plt.ylabel('Price')
         plt.title('Inverse Demand and Supply Curves')
@@ -249,11 +253,15 @@ class monopoly_model_extension(duopoly_model):
         q = np.linspace(0, self.par.a / self.par.b, 100)  # range of quantities
         p_demand = self.par.a - self.par.b * q  # inverse demand function
         equilibrium_quantity = self.equilibrium_quantity_monopoly()  # equilibrium quantity
+        equilibrium_price = self.par.a - self.par.b * equilibrium_quantity  # equilibrium price
 
         plt.figure(figsize=(8, 6))
         plt.plot(q, p_demand, label='Demand')
         plt.axvline(x=equilibrium_quantity, color='r', linestyle='-', label='Supply')
         plt.axhline(y=50, color='g', linestyle='--', label='Price at 50')  # horizontal line at price 50
+        plt.scatter(equilibrium_quantity, equilibrium_price, color='b')  # intersection point
+        plt.text(equilibrium_quantity + 0.20 * (self.par.a / self.par.b), equilibrium_price + 0.05 * self.par.a, 
+                f'({equilibrium_quantity:.2f}, {equilibrium_price:.2f})', horizontalalignment='right')  # text indicating the intersection point
         plt.xlabel('Quantity')
         plt.ylabel('Price')
         plt.title('Inverse Demand and Supply Curves')
