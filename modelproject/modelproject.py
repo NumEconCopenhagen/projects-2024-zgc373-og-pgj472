@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import ipywidgets as widgets
 import sympy as sm
 from scipy.optimize import fsolve
+from scipy.optimize import root
 
 # We start by creating a class called parameters which will be used to store the parameters of the model
 class parameters:
@@ -23,6 +24,7 @@ class duopoly_model:
         self.a_slider = widgets.FloatSlider(min=50, max=150, step=1, value=100, description='a:')
         self.b_slider = widgets.FloatSlider(min=5, max=25, step=0.1, value=16, description='b:')
         self.MC_slider = widgets.FloatSlider(min=0.5, max=5, step=0.1, value=4, description='MC:')
+        self.sol = SimpleNamespace()
     
     # Add a new method for the interactive plot    
     def interactive_plot(self):    
@@ -60,6 +62,16 @@ class duopoly_model:
     def br2(self, q1):
         return (self.par.a - self.par.MC) / (2 * self.par.b) - q1 / 2
     
+    def solve_numerical(self):
+        def inv_br2(x):
+            return -(x - (self.par.a - self.par.MC) / (2*self.par.b))*2
+
+        def objective_function(x):
+            return self.br1(x) - inv_br2(x)
+        x0 = 3
+        result = root(objective_function, x0)
+        return result.x
+    
     # We define the Cournot-Nash equilibrium quantity for each firm:
     def equilibrium_quantity_firm1(self):
         return (self.par.a - self.par.MC) / (3 * self.par.b)
@@ -74,6 +86,9 @@ class duopoly_model:
     # Calculate and return the equilibrium price
     def equilibrium_price(self):       
         return self.par.a - self.par.b * self.total_equilibrium_quantity()
+    
+
+
     
     def update_plot(self, a, b, MC):
         self.par.a = a
@@ -150,6 +165,37 @@ class duopoly_model_extension(duopoly_model):
     def update_plot(self):
         super().update_plot(100, 16, 0)
 
+    def solve_numerical_ex(self):
+        def inv_br2(x):
+            return -(x - self.par.a / (2*self.par.b))*2
+
+        def objective_function(x):
+            return self.br1(x) - inv_br2(x)
+        x0 = 3
+        result = root(objective_function, x0)
+        return result.x
+    
+    def plot_duo(self):
+        q = np.linspace(0, self.par.a / self.par.b, 100)  # range of quantities
+        p_demand = self.par.a - self.par.b * q  # inverse demand function
+        equilibrium_quantity = self.equilibrium_quantity_firm1() + self.equilibrium_quantity_firm2()  # equilibrium quantity
+
+        plt.figure(figsize=(8, 6))
+        plt.plot(q, p_demand, label='Demand')
+        plt.axvline(x=equilibrium_quantity, color='r', linestyle='-', label='Supply')
+        plt.axhline(y=33.33, color='g', linestyle='--', label='Price at 33.33')  # horizontal line at price 50
+        plt.xlabel('Quantity')
+        plt.ylabel('Price')
+        plt.title('Inverse Demand and Supply Curves')
+        plt.legend()
+        plt.show()
+
+    def consumer_surplus_duo(self):
+        return 0.5 * (self.par.a - 33.33) * (self.equilibrium_quantity_firm1()+self.equilibrium_quantity_firm2())
+
+    def producer_surplus_duo(self):
+        return 33.33 * (self.equilibrium_quantity_firm1()+self.equilibrium_quantity_firm2())
+
     def print_results(self, q1, q2):
         print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity_firm1())
         print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity_firm2())
@@ -162,8 +208,9 @@ class duopoly_model_extension(duopoly_model):
 
 class monopoly_model_extension(duopoly_model):
     def __init__(self):
+        self.sol = SimpleNamespace()
         super().__init__(100, 16, 0)
-    
+        
     def cost_function(self, qi):
         return 0
 
@@ -189,70 +236,39 @@ class monopoly_model_extension(duopoly_model):
     def update_plot(self):
         super().update_plot(100, 16, 0)
 
-    def print_results(self, Q_ex):
+    def solve_numerical_mon(self):
+        
+        x0 = 3
+        result = optimize.minimize(lambda x: -self.profit_function(x), x0)
+        
+        self.sol = SimpleNamespace()
+        self.sol.Q = result.x
+        return result.x
+    
+    def plot_mon(self):
+        q = np.linspace(0, self.par.a / self.par.b, 100)  # range of quantities
+        p_demand = self.par.a - self.par.b * q  # inverse demand function
+        equilibrium_quantity = self.equilibrium_quantity_monopoly()  # equilibrium quantity
+
+        plt.figure(figsize=(8, 6))
+        plt.plot(q, p_demand, label='Demand')
+        plt.axvline(x=equilibrium_quantity, color='r', linestyle='-', label='Supply')
+        plt.axhline(y=50, color='g', linestyle='--', label='Price at 50')  # horizontal line at price 50
+        plt.xlabel('Quantity')
+        plt.ylabel('Price')
+        plt.title('Inverse Demand and Supply Curves')
+        plt.legend()
+        plt.show()
+
+    def consumer_surplus_mon(self):
+        return 0.5 * (self.par.a - 50) * self.equilibrium_quantity_monopoly()
+
+    def producer_surplus_mon(self):
+        return 50 * self.equilibrium_quantity_monopoly()
+
+    def print_results(self):
         print("Quantity produced per firm:", self.quantity_per_firm())
         print("Total quantity produced::", self.equilibrium_quantity_monopoly())
         print("Price in equilibrium:", self.price_monopoly())  
-        print("Profit per firm:", self.profit_per_firm(Q_ex))  
-
-
-
-
-
-
-
-
-#class monopoly_model_extension:
-
-    def __init__(self, a, b, MC):
-        self.par = parameters(a, b, MC)
-        self.par = parameters(a, b, MC)
-        self.a_slider = widgets.FloatSlider(min=50, max=150, step=0.1, value=100, description='a:')
-        self.b_slider = widgets.FloatSlider(min=5, max=25, step=0.1, value=16, description='b:')
-        self.MC_slider = widgets.FloatSlider(min=0.5, max=5, step=0.1, value=4, description='MC:')
-    
-    # Add a new method for the interactive plot for monopoly
-    def interactive_plot_monopoly(self): 
-        widgets.interact(self.calculate_values, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
-
-    # We define the cost function:
-    def cost_function(self, Q):
-        return 0
-
-    # We define the profit function for the monopoly:
-    def profit_function(self, Q):
-        p = self.par.a - self.par.b * Q
-        return p * Q - self.cost_function(Q)
-
-    # We define the first order condition for the monopoly:
-    def foc(self, Q):
-        return self.par.a - 2 * self.par.b * Q - self.par.MC
-
-    # We define the monopoly quantity:
-    def monopoly_quantity(self):
-        return (self.par.a - self.par.MC) / (2 * self.par.b)
-
-    # We define the monopoly price:
-    def monopoly_price(self):
-        Q = self.monopoly_quantity()
-        return self.par.a - self.par.b * Q
-
-    # We define the monopoly profit:
-    def monopoly_profit(self):
-        Q = self.monopoly_quantity()
-        return self.profit_function(Q)
-    
-    def calculate_values(self, a, b, MC):
-        self.par.a = a
-        self.par.b = b
-        self.par.MC = MC
-
-        # Calculate the monopoly quantity, price, and profit
-        monopoly_q = self.monopoly_quantity()
-        monopoly_p = self.monopoly_price()
-        monopoly_profit = self.monopoly_profit()
-
-        print("Quantity produced under monopoly is:", monopoly_q)
-        print("Price in monopoly:", monopoly_p)
-        print("Profit for monopoly:", monopoly_profit)
+        print("Profit per firm:", self.profit_per_firm(self.sol.Q))  
 
