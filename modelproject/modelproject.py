@@ -20,9 +20,9 @@ class duopoly_model:
 
     def __init__(self, a, b, MC):
         self.par = parameters(a, b, MC)
-        self.a_slider = widgets.FloatSlider(min=10, max=50, step=1, value=30, description='a:')
-        self.b_slider = widgets.FloatSlider(min=1, max=5, step=0.1, value=3, description='b:')
-        self.MC_slider = widgets.FloatSlider(min=1, max=25, step=0.1, value=13, description='MC:')
+        self.a_slider = widgets.FloatSlider(min=50, max=150, step=1, value=30, description='a:')
+        self.b_slider = widgets.FloatSlider(min=5, max=25, step=0.1, value=3, description='b:')
+        self.MC_slider = widgets.FloatSlider(min=0.5, max=5, step=0.1, value=13, description='MC:')
     
     # Add a new method for the interactive plot    
     def interactive_plot(self):    
