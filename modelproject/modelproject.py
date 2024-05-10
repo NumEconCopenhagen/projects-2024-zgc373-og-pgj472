@@ -291,11 +291,11 @@ class monopoly_model_extension(duopoly_model):
         self.equilibrium_quantity_firm1() + self.equilibrium_quantity_firm2()
 
         # Add rows for each metric
-        table.add_row(["Price", duopoly_model_extension.equilibrium_price(), monopoly_model_extension.price_monopoly()])
-        table.add_row(["Quantity Produced", duopoly_model_extension.equilibrium_quantity_firm1() + duopoly_model_extension.equilibrium_quantity_firm2(), monopoly_model_extension.equilibrium_quantity_monopoly()])
-        table.add_row(["Profit", duopoly_model_extension.profit_function1(2.083, 2.083), monopoly_model_extension.profit_per_firm(3.125)])
-        table.add_row(["Consumer Surplus", duopoly_model_extension.consumer_surplus_duo(), monopoly_model_extension.consumer_surplus_mon()])
-        table.add_row(["Producer Surplus", duopoly_model_extension.producer_surplus_duo(), monopoly_model_extension.producer_surplus_mon()])
+        table.add_row(["Quantity Produced", f"{duopoly_model_extension.equilibrium_quantity_firm1() + duopoly_model_extension.equilibrium_quantity_firm2():.3f}", f"{monopoly_model_extension.equilibrium_quantity_monopoly():.3f}"])
+        table.add_row(["Price", f"{duopoly_model_extension.equilibrium_price():.3f}", f"{monopoly_model_extension.price_monopoly():.3f}"])
+        table.add_row(["Profit", f"{duopoly_model_extension.profit_function1(2.083, 2.083):.3f}", f"{monopoly_model_extension.profit_per_firm(3.125):.3f}"])
+        table.add_row(["Consumer Surplus", f"{duopoly_model_extension.consumer_surplus_duo():.3f}", f"{monopoly_model_extension.consumer_surplus_mon():.3f}"])
+        table.add_row(["Producer Surplus", f"{duopoly_model_extension.producer_surplus_duo():.3f}", f"{monopoly_model_extension.producer_surplus_mon():.3f}"])
 
         # Print the table
         print(table)
