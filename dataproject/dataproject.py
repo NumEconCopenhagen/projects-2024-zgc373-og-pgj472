@@ -259,30 +259,24 @@ class StockData:
 
         return portfolio_expected_return
 
-    # Values is equal to expected return from the 'expected_returns_df_filtered'
-    values_two_stock = [0.118517568275349, 0.053565249783654]
-    values_four_stock = [0.118517568275349, 0.053565249783654, 0.039587017095891, 0.033614181941397]
-    values_six_stock = [0.118517568275349, 0.053565249783654, 0.039587017095891, 0.033614181941397, 0.057441814728990, 0.053610256468914]   
-    
-    # We will convert the list to a numpy array, so we can use it in calculations
-    two_stock_vector = np.array(values_two_stock)
-    four_stock_vector = np.array(values_four_stock)
-    six_stock_vector = np.array(values_six_stock)
+    # We create a new function to calculate the expected return for the whole portfolio
+    def create_pert(self, expected_returns_df_filtered, df_two, df_four, df_six):
+        self.values_two_stock = expected_returns_df_filtered[:2]
+        self.values_four_stock = expected_returns_df_filtered[:4]
+        self.values_six_stock = expected_returns_df_filtered
 
-    # We are here using the normalized_z_vector values (how much of each stock we should have in our portfolios)
-    values_z_vector_two = [0.540426730926023, 0.459573269073977]
-    values_z_vector_four = [0.074470299963800, 0.041449232247399, 0.433757794565312, 0.450322673223489]
-    values_z_vector_six = [0.060682514783692, 0.046975603420424, 0.423018817709440, 0.445371017675944, -0.030914761366453, 0.054866807776954]   
-    
-    # We convert the list to a numpy array, so we can use it in calculations
-    z_vector_two = np.array(values_z_vector_two)
-    z_vector_four = np.array(values_z_vector_four)
-    z_vector_six = np.array(values_z_vector_six)
+        self.two_stock_vector = np.array(self.values_two_stock).T[0]
+        self.four_stock_vector = np.array(self.values_four_stock).T[0]
+        self.six_stock_vector = np.array(self.values_six_stock).T[0]
 
-    # We are calculating the expected return for the whole portfolio for each set of stocks.
-    portfolio_expected_return_two = np.dot(two_stock_vector, z_vector_two)
-    portfolio_expected_return_four = np.dot(four_stock_vector, z_vector_four)
-    portfolio_expected_return_six = np.dot(six_stock_vector, z_vector_six)
+        self.z_vector_two = np.array(df_two).T[0]
+        self.z_vector_four = np.array(df_four).T[0]
+        self.z_vector_six = np.array(df_six).T[0]
+        
+
+        self.portfolio_expected_return_two = np.dot(self.two_stock_vector, self.z_vector_two)
+        self.portfolio_expected_return_four = np.dot(self.four_stock_vector, self.z_vector_four)
+        self.portfolio_expected_return_six = np.dot(self.six_stock_vector, self.z_vector_six)
 
     # We define a function to calculate the portfolio variance for each set
     def calculate_portfolio_variances(self):
@@ -297,3 +291,153 @@ class StockData:
         self.portfolio_std_dev_two = np.sqrt(self.portfolio_variance_two)
         self.portfolio_std_dev_four = np.sqrt(self.portfolio_variance_four)
         self.portfolio_std_dev_six = np.sqrt(self.portfolio_variance_six)
+
+    def plot_two_stock(self):
+        # We create an array of weights from 0 to 1 with a step of 0.01
+        weights = np.arange(0, 1.0, 0.01)
+
+        # We initialize lists to store the portfolio variances, expected returns and the volatility
+        portfolio_variances = []
+        portfolio_expected_returns = []
+        portfolio_volatilities = []
+
+        # We will loop over the weights
+        for w in weights:
+            # We create the weight vector
+            weight_vector = np.array([w, 1 - w])
+
+            # We calculate the portfolio variance
+            portfolio_variance = np.dot(weight_vector.T, np.dot(self.calculate_covariance("two"), weight_vector))
+            portfolio_variances.append(portfolio_variance)
+
+            # We calculate the portfolio volatility
+            portfolio_volatility = np.sqrt(portfolio_variance)
+            portfolio_volatilities.append(portfolio_volatility)
+
+            # We calculate the portfolio expected return
+            portfolio_expected_return = np.dot(weight_vector, self.two_stock_vector)
+            portfolio_expected_returns.append(portfolio_expected_return)
+
+        # We convert the lists of volatility and expected returns to numpy arrays
+        portfolio_volatilities = np.array(portfolio_volatilities)
+        portfolio_expected_returns = np.array(portfolio_expected_returns)
+
+        # We are adding our pre-calculated expected return and variance (red-dot)
+        precalculated_std_dev_two = self.portfolio_std_dev_two
+        precalculated_expected_return_two = self.portfolio_expected_return_two
+
+        # We plot the pre-calculated expected return and volatility and the new calculated expected return and volatility
+        plt.plot(portfolio_volatilities, portfolio_expected_returns, label='Portfolio')
+        plt.plot(precalculated_std_dev_two, precalculated_expected_return_two, 'ro', label='Two stocks')
+
+        # We add labels and title
+        plt.xlabel('Portfolio volatility (standard deviation)')
+        plt.ylabel('Portfolio Expected Return')
+        plt.title('Portfolio Variance vs Expected Return')
+
+        plt.legend()
+        plt.show()
+
+    def plot_four_stock(self):
+        # We create an array of weights from 0 to 3 with a step of 0.01
+        weights_four = np.arange(0, 3.0, 0.01)
+
+        # We initialize lists to store the portfolio variances, expected returns and the volatility
+        portfolio_variances = []
+        portfolio_expected_returns = []
+        portfolio_volatilities = []
+
+        # We loop over the weights
+        for w in weights_four:
+            # We create the weight vector, so each stock is equally weighted
+            w1 = w
+            w2 = (1 - w) / 3
+            w3 = (1 - w) / 3
+            w4 = (1 - w) / 3
+        
+            weight_vector_four = np.array([w1, w2, w3, w4])
+
+            # We calculate the portfolio variance
+            portfolio_variance = np.dot(weight_vector_four.T, np.dot(self.calculate_covariance("four"), weight_vector_four))
+            portfolio_variances.append(portfolio_variance)
+
+            # We calculate the portfolio volatility
+            portfolio_volatility = np.sqrt(portfolio_variance)
+            portfolio_volatilities.append(portfolio_volatility)
+
+            # We calculate the portfolio expected return
+            portfolio_expected_return = np.dot(weight_vector_four, self.four_stock_vector)
+            portfolio_expected_returns.append(portfolio_expected_return)
+
+        # We convert the lists of volatility and expected returns to numpy arrays
+        portfolio_volatilities = np.array(portfolio_volatilities)
+        portfolio_expected_returns = np.array(portfolio_expected_returns)
+
+        # We add our pre-calculated expected return and volatility
+        precalculated_std_dev_four = self.portfolio_std_dev_four
+        precalculated_expected_return_four = self.portfolio_expected_return_four
+
+        # We create the plot
+        plt.plot(portfolio_volatilities, portfolio_expected_returns, label='Portfolio')
+        plt.plot(precalculated_std_dev_four, precalculated_expected_return_four, 'ro', label='Four stocks')
+
+        # We add labels and title
+        plt.xlabel('Portfolio volatility (standard deviation)')
+        plt.ylabel('Portfolio Expected Return')
+        plt.title('Portfolio Variance vs Expected Return')
+
+        plt.legend()
+        plt.show()
+
+    def plot_six_stock(self):
+        # We create an array of weights from 0 to 5 with a step of 0.01
+        weights_six = np.arange(0, 5.0, 0.01)
+
+        # We initialize lists to store the portfolio variances, expected returns and the volatility
+        portfolio_variances = []
+        portfolio_expected_returns = []
+        portfolio_volatilities = []
+
+        # We loop over the weights
+        for w in weights_six:
+            # We create the weight vector so each stock is equally weighted
+            w1 = w
+            w2 = (1 - w) / 5
+            w3 = (1 - w) / 5
+            w4 = (1 - w) / 5
+            w5 = (1 - w) / 5
+            w6 = (1 - w) / 5
+
+            weight_vector_six = np.array([w1, w2, w3, w4, w5, w6])
+
+            # We calculate the portfolio variance
+            portfolio_variance = np.dot(weight_vector_six.T, np.dot(self.calculate_covariance("six"), weight_vector_six))
+            portfolio_variances.append(portfolio_variance)
+
+            # We calculate the portfolio volatility
+            portfolio_volatility = np.sqrt(portfolio_variance)
+            portfolio_volatilities.append(portfolio_volatility)
+
+            # We calculate the portfolio expected return
+            portfolio_expected_return = np.dot(weight_vector_six, self.six_stock_vector)
+            portfolio_expected_returns.append(portfolio_expected_return)
+
+        # We convert the lists of volatility and expected return to numpy arrays
+        portfolio_volatilities = np.array(portfolio_volatilities)
+        portfolio_expected_returns = np.array(portfolio_expected_returns)
+
+        # We add our pre-calculated expected return and volatility
+        precalculated_std_dev_six = self.portfolio_std_dev_six
+        precalculated_expected_return_six = self.portfolio_expected_return_six
+
+        # We create the plot
+        plt.plot(portfolio_volatilities, portfolio_expected_returns, label='Portfolio')
+        plt.plot(precalculated_std_dev_six, precalculated_expected_return_six, 'ro', label='Six stocks')
+
+        # We add labels and title
+        plt.xlabel('Portfolio volatility (standard deviation)')
+        plt.ylabel('Portfolio Expected Return')
+        plt.title('Portfolio Variance vs Expected Return')
+
+        plt.legend()
+        plt.show()
