@@ -208,76 +208,41 @@ class ExchangeEconomyClass:
 
 
     def optimal_allocation_q4a(self):
-        # We create the specified range for p1 and setting p2 as numeraire.
         N = 75
-        p1_range = [0.5+2*t/N for t in range(N+1)]
+        p1_range = np.linspace(0.5, 2.5, N+1)
         p2 = 1
 
-        # Define the utility function for consumer A
-        def utility_A(x1B, x2B, p1, par):
-            if x1B > 1 or x2B > 1:
-                return float('-inf')
-            return (1-x1B)**par.alpha*(1-x2B)**(1-par.alpha)
+        max_utility = -np.inf
+        optimal_p1 = np.nan
+        xA1_optimal_q4a = np.nan
+        xA2_optimal_q4a = np.nan
 
-        # Define a function that maximizes consumer A's utility given the demand for goods by consumer B and p1.
-        def max_utility_A_given_B(par):
-            max_utility = float('-inf')
-            optimal_p1 = None
-            for p1 in p1_range:
-                # Calculate demand for goods by consumer B given p1:
-                x1B, x2B = self.demand_B(p1, p2)
-                
-                # Calculate utility of consumer A given demand of B and prices p1
-                utility_A_q4a = utility_A(x1B, x2B, p1, par)
-                
-                # Check if this utility is greater than the current max_utility
-                if utility_A_q4a > max_utility:
-                    max_utility = utility_A_q4a
-                    optimal_p1 = p1
+        for p1 in p1_range:
+            x1B, x2B = self.demand_B(p1, p2)
+            x1A = 1 - x1B
+            x2A = 1 - x2B
 
-            return -max_utility, optimal_p1
+            utility = self.utility_A(x1A, x2A)
+            if utility > max_utility:
+                max_utility = utility
+                optimal_p1 = p1
+                xA1_optimal_q4a = x1A
+                xA2_optimal_q4a = x2A
 
-        # Optimize the utility of consumer A in the given range of p1
-        optimal_p1 = max_utility_A_given_B(self.par)
+        #We calculate the utility for consumer A given the optimal p1 and x1A and x2A:
+        utility_A_optimal_q4a = self.utility_A(xA1_optimal_q4a, xA2_optimal_q4a)
 
         # Calculate the demand for goods by consumer B with the optimal p1
         x1B_optimal_q4a, x2B_optimal_q4a = self.demand_B(optimal_p1, p2)
 
-        # Calculate the optimal amount of the two goods for consumer A
-        x1A_optimal_q4a = 1 - x1B_optimal_q4a
-        x2A_optimal_q4a = 1 - x2B_optimal_q4a
+        #We calculate the utility for consumer B:
+        utility_B_optimal_q4a = self.utility_B(x1B_optimal_q4a, x2B_optimal_q4a)
 
-        return optimal_p1, x1A_optimal_q4a, x2A_optimal_q4a
-
-    #def optimal_allocation_q4a(self):
-        #We create the specified range for p1 and setting p2 as numeraire.
-        N = 75
-        p1 = [0.5+2*t/N for t in range(N+1)]
-        p2 = 1
-
-        # Define the utility function for consumer A
-        def utility_A(x1B, x2B, p1, par):
-            return (1-x1B)**par.alpha*(1-x2B)**(1-par.alpha)
-
-        # Define a function that maximizes consumer A's utility given the demand for goods by consumer B and p1.
-        def max_utility_A_given_B(p1, par):
-            # Calculate demand for goods by consumer B given p1:
-            x1B, x2B = self.demand_B(p1, 1)
-            
-            # Calculate utility of consumer A given demand of B and prices p1
-            utility_A_q4a = utility_A(x1B, x2B, p1, par)
-            
-            # Use negative utility because we are maximizing from scipy
-            return -utility_A_q4a
-
-        # Initial guess for p1
-        p1_initial_guess = 0.944444460152919
-
-        # Optimize the utility of consumer A in the given range of p1:
-
-
-
-
+        print("Optimal p1:", optimal_p1)
+        print("Consumer A's optimal allocation: x1A =", xA1_optimal_q4a, "x2A =", xA2_optimal_q4a)
+        print("Utility for consumer A:", utility_A_optimal_q4a)
+        print("Consumer B's optimal allocation: x1B =", x1B_optimal_q4a, "x2B =", x2B_optimal_q4a)
+        print("Utility for consumer B:", utility_B_optimal_q4a)
 
     def optimal_allocation_q4b(self):
         #We create the specified range for p1 and setting p2 as numeraire.
@@ -295,10 +260,10 @@ class ExchangeEconomyClass:
             x1B, x2B = self.demand_B(p1, 1)
             
             # Calculate utility of consumer A given demand of B and prices p1
-            utility_A_q4a = utility_A(x1B, x2B, p1, par)
+            utility_A_q4b = utility_A(x1B, x2B, p1, par)
             
             # Use negative utility because we are maximizing from scipy
-            return -utility_A_q4a
+            return -utility_A_q4b
 
         # Initial guess for p1
         p1_initial_guess = 0.944444460152919
@@ -310,21 +275,24 @@ class ExchangeEconomyClass:
         optimal_p1 = result.x[0]
 
         # Calculate the demand for goods by consumer B with the optimal p1
-        x1B_optimal_q4a, x2B_optimal_q4a = self.demand_B(optimal_p1, 1)
+        x1B_optimal_q4b, x2B_optimal_q4b = self.demand_B(optimal_p1, 1)
 
         # Calculate the utility of consumer A with the optimal p1 and optimal demand of B
-        utility_A_optimal_q4a = utility_A(x1B_optimal_q4a, x2B_optimal_q4a, optimal_p1, self.par)
+        utility_A_optimal_q4b = utility_A(x1B_optimal_q4b, x2B_optimal_q4b, optimal_p1, self.par)
 
         # Calculate the optimal amount of the two goods for consumer A
-        x1A_optimal_q4a = 1 - x1B_optimal_q4a
-        x2A_optimal_q4a = 1 - x2B_optimal_q4a
+        x1A_optimal_q4b = 1 - x1B_optimal_q4b
+        x2A_optimal_q4b = 1 - x2B_optimal_q4b
 
         # Calculate consumer B's utility:
-        utility_B_optimal_q4a = self.utility_B(x1B_optimal_q4a, x2B_optimal_q4a)
+        utility_B_optimal_q4b = self.utility_B(x1B_optimal_q4b, x2B_optimal_q4b)
 
         # Print out the optimal price, utility for both consumers plus both consumers optimal allocations
         print("Optimal p1:", optimal_p1)
-        print("Consumer B's allocations:", "x1B =", x1B_optimal_q4a, "x2B =", x2B_optimal_q4a)
-        print("Utility for consumer A given B's x1B and x2B as well p1:", utility_A_optimal_q4a)
-        print("Consumer A's allocations:", "x1A =", x1A_optimal_q4a, "x2A =", x2A_optimal_q4a)
-        print("Utility for consumer B:", utility_B_optimal_q4a)
+        print("Consumer B's allocations:", "x1B =", x1B_optimal_q4b, "x2B =", x2B_optimal_q4b)
+        print("Utility for consumer A given B's x1B and x2B as well p1:", utility_A_optimal_q4b)
+        print("Consumer A's allocations:", "x1A =", x1A_optimal_q4b, "x2A =", x2A_optimal_q4b)
+        print("Utility for consumer B:", utility_B_optimal_q4b)
+
+
+
