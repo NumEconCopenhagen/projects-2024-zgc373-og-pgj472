@@ -207,7 +207,49 @@ class ExchangeEconomyClass:
         print("Utility for consumer B given p1 and optimal allocations:", utility_B_q3)
 
 
-    def optimal_allocation(self):
+    def optimal_allocation_q4a(self):
+        # We create the specified range for p1 and setting p2 as numeraire.
+        N = 75
+        p1_range = [0.5+2*t/N for t in range(N+1)]
+        p2 = 1
+
+        # Define the utility function for consumer A
+        def utility_A(x1B, x2B, p1, par):
+            if x1B > 1 or x2B > 1:
+                return float('-inf')
+            return (1-x1B)**par.alpha*(1-x2B)**(1-par.alpha)
+
+        # Define a function that maximizes consumer A's utility given the demand for goods by consumer B and p1.
+        def max_utility_A_given_B(par):
+            max_utility = float('-inf')
+            optimal_p1 = None
+            for p1 in p1_range:
+                # Calculate demand for goods by consumer B given p1:
+                x1B, x2B = self.demand_B(p1, p2)
+                
+                # Calculate utility of consumer A given demand of B and prices p1
+                utility_A_q4a = utility_A(x1B, x2B, p1, par)
+                
+                # Check if this utility is greater than the current max_utility
+                if utility_A_q4a > max_utility:
+                    max_utility = utility_A_q4a
+                    optimal_p1 = p1
+
+            return -max_utility, optimal_p1
+
+        # Optimize the utility of consumer A in the given range of p1
+        optimal_p1 = max_utility_A_given_B(self.par)
+
+        # Calculate the demand for goods by consumer B with the optimal p1
+        x1B_optimal_q4a, x2B_optimal_q4a = self.demand_B(optimal_p1, p2)
+
+        # Calculate the optimal amount of the two goods for consumer A
+        x1A_optimal_q4a = 1 - x1B_optimal_q4a
+        x2A_optimal_q4a = 1 - x2B_optimal_q4a
+
+        return optimal_p1, x1A_optimal_q4a, x2A_optimal_q4a
+
+    #def optimal_allocation_q4a(self):
         #We create the specified range for p1 and setting p2 as numeraire.
         N = 75
         p1 = [0.5+2*t/N for t in range(N+1)]
@@ -229,7 +271,37 @@ class ExchangeEconomyClass:
             return -utility_A_q4a
 
         # Initial guess for p1
-        p1_initial_guess = 0.9533
+        p1_initial_guess = 0.944444460152919
+
+        # Optimize the utility of consumer A in the given range of p1:
+
+
+
+
+
+    def optimal_allocation_q4b(self):
+        #We create the specified range for p1 and setting p2 as numeraire.
+        N = 75
+        p1 = [0.5+2*t/N for t in range(N+1)]
+        p2 = 1
+
+        # Define the utility function for consumer A
+        def utility_A(x1B, x2B, p1, par):
+            return (1-x1B)**par.alpha*(1-x2B)**(1-par.alpha)
+
+        # Define a function that maximizes consumer A's utility given the demand for goods by consumer B and p1.
+        def max_utility_A_given_B(p1, par):
+            # Calculate demand for goods by consumer B given p1:
+            x1B, x2B = self.demand_B(p1, 1)
+            
+            # Calculate utility of consumer A given demand of B and prices p1
+            utility_A_q4a = utility_A(x1B, x2B, p1, par)
+            
+            # Use negative utility because we are maximizing from scipy
+            return -utility_A_q4a
+
+        # Initial guess for p1
+        p1_initial_guess = 0.944444460152919
 
         # Optimize the utility of consumer A: 
         result = minimize(max_utility_A_given_B, p1_initial_guess, args=(self.par,))
