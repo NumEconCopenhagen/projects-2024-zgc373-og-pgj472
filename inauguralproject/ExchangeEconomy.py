@@ -294,5 +294,58 @@ class ExchangeEconomyClass:
         print("Consumer A's allocations:", "x1A =", x1A_optimal_q4b, "x2A =", x2A_optimal_q4b)
         print("Utility for consumer B:", utility_B_optimal_q4b)
 
+    def optimal_allocation_q5a(self):
+        # Initialize an empty list to store valid combinations
+        N = 75
+        xlist=[]
+
+        #We define the initial utility for consumer A and B with initial endowments:
+        uA_initial = self.utility_A(self.par.w1A, self.par.w2A)
+        uB_initial = self.utility_B(self.par.w1B, self.par.w2B)
+        print("Initial utility for A:", (uA_initial))
+        print("Initial utility for B:", (uB_initial))
+
+        # Loop through possible combinations of xA1 and xA2
+        for xA1 in np.arange(0,1,1/N):
+            for xA2 in np.arange(0,1,1/N):
+                xB1 = 1-xA1
+                xB2 = 1-xA2
+                # Compute utility for consumers A and B
+                uA = self.utility_A(xA1,xA2)
+                uB = self.utility_B(xB1,xB2)
+
+                # Check if the combination satisfies initial conditions. If they do, the allocation is considered valid and added to xlist.
+                if uA >= uA_initial and uB >= uB_initial:
+                    xlist.append((xA1,xA2))
+
+        #The valid allocations stored in xlist are unpacked into x_values and y_values, which represent the allocations for good 1 and good 2 for consumer A.
+        x_values, y_values = zip(*xlist)
+
+        # Use the list that saves values in Z "xlist"
+        uA_Z = -np.inf
+        xA1_Z= np.nan
+        xA2_Z= np.nan
+
+        # We check and confirm that the new allocation gives a higher utility than the initial allocation.
+        # We initialize varialbes to find the highest utility for A, meaning uA_Z and the belonging allocations xA1_Z and xA2_Z:
+        for xA1, xA2 in xlist:
+            if self.utility_A(xA1,xA2) > uA_Z:
+                uA_Z = self.utility_A(xA1,xA2)
+                xA1_Z= xA1
+                xA2_Z= xA2
+
+        #We calculate the price of good 1 by using the formula given in the assignment for x_1^A where we isolate p1:
+        p1_q5a = self.par.alpha*self.par.w2A/(xA1_Z-self.par.alpha*self.par.w1A)
+
+        print("Utility for consumer A with new allocation:", uA_Z)
+        print("Utility for consumer B with new allocation:", self.utility_B(1-xA1_Z,1-xA2_Z))
+        print("New allocation for consumer A:", "xA1 =", xA1_Z, "xA2 =", xA2_Z)
+        print("New allocation for consumer B:", "xB1 =", 1-xA1_Z, "xB2 =", 1-xA2_Z)
+        print("Price of good 1:", p1_q5a)
+
+
+        
+
+
 
 
