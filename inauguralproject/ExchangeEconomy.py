@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
 from scipy.optimize import root
+from scipy import optimize 
+from scipy.optimize import brentq
 import numpy as np
 
 class ExchangeEconomyClass:
@@ -54,12 +56,7 @@ class ExchangeEconomyClass:
 
 
 ##### Herfra starter den nye kode #####
-    def main(self):
-        #First we link our notebook (ipynb) to our python file (py) where we have predefined the given utility functions, demand functions and different parameters. Thereby we can extract them from the py file to use in the ipynb file.
-        #model = ExchangeEconomyClass()
-        #With the following we make it possible to use parameters from our py file by just writing "par" before a parameter.
-        #par = model.par
-
+    def Edgeworth(self):
         # We define the total endowment for both goods: 
         w1bar = 1.0
         w2bar = 1.0
@@ -120,12 +117,11 @@ class ExchangeEconomyClass:
         ax_A.legend(frameon=True,loc='upper right',bbox_to_anchor=(1.7,1.0))
         plt.show()
 
-    def plot_errors():
-        model = ExchangeEconomyClass()
+    def plot_errors(self):
 
         N = 75  # assuming N is 75 as in your previous code
         p1 = [0.5+2*t/N for t in range(N+1)]
-        epsilon = [model.check_market_clearing(t, 1) for t in p1]
+        epsilon = [self.check_market_clearing(t, 1) for t in p1]
 
         error1 = [error[0] for error in epsilon]
         error2 = [error[1] for error in epsilon]
@@ -141,6 +137,21 @@ class ExchangeEconomyClass:
         plt.legend()
 
         plt.show()
+        
+    def excess_demand(self, p1):
+        par = self.par
+
+        x1A, x2A = self.demand_A(p1, 1)
+        x1B, x2B = self.demand_B(p1, 1)
+
+        aggregate_demand_x1 = x1A + x1B
+        total_endowment_x1 = par.w1A + (1 - par.w1A)
+
+        return aggregate_demand_x1 - total_endowment_x1
+
+    def find_market_clearing_price(self):
+        p1_clearing = brentq(self.excess_demand, 0.01, 10)
+        return p1_clearing, 1
 
     def find_optimal_allocations_and_utilities(self):
         # We initialize variables to track minimum absolute errors and corresponding p1 values:
