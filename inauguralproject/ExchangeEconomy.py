@@ -343,6 +343,36 @@ class ExchangeEconomyClass:
         print("New allocation for consumer B:", "xB1 =", 1-xA1_Z, "xB2 =", 1-xA2_Z)
         print("Price of good 1:", p1_q5a)
 
+    def optimal_allocation_q5b(self):
+        #We need to delete the constraints we put on A and therefore we only keep the ones for B:
+        def constraint2(x):
+            x1A, x2A = x
+            return self.utility_B(1 - x1A, 1 - x2A) - self.utility_B(self.par.w1B, self.par.w2B)
+
+        #We define the total utility of consumer B with initial endowments
+        uA_initial = self.utility_A(self.par.w1A, self.par.w2A)
+        uB_initial = self.utility_B(self.par.w1B, self.par.w2B)
+        print("Initial utility for A:", (uA_initial))
+        print("Initial utility for B:", (uB_initial))
+
+        #We set the bounds for x1A and x2A, meaning that the allocation can only be between 0 and 1.
+        bounds = [(0, 1), (0, 1)]
+
+        #We perform the optimization using the bounds defined and the constraints above.
+        result = minimize(lambda x: -self.utility_A(x[0], x[1]), x0=(0.5, 0.5), bounds=bounds, constraints=[{'type': 'ineq', 'fun': constraint2}])
+
+        #We extract the result that we get into x1A_optimal and x2a_optimal
+        x1A_optimal_q5b, x2A_optimal_q5b = result.x
+
+        #We print out the results.
+        print("x1A and x2A with no further restrictions (x1A =", x1A_optimal_q5b,", x2A =", x2A_optimal_q5b, ")")
+        print("x1B and x2B (x1B =", 1-x1A_optimal_q5b,", x2B =", 1-x2A_optimal_q5b, ")")
+        print("Consumer A's utility with no restrictions:", self.utility_A(x1A_optimal_q5b, x2A_optimal_q5b))
+        print("Consumer B's utility:", self.utility_B(1-x1A_optimal_q5b, 1-x2A_optimal_q5b))
+
+        #We calculate the price of good 1 by using the formula given in the assignment for x_1^A where we isolate p1:
+        p1_q5b = self.par.alpha*self.par.w2A/(x1A_optimal_q5b-self.par.alpha*self.par.w1A)
+        print("Optimal price:", p1_q5b)
 
         
 
