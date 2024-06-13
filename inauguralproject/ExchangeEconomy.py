@@ -4,6 +4,7 @@ from scipy.optimize import root
 from scipy import optimize
 from scipy.optimize import brentq
 from scipy.optimize import minimize
+import pandas as pd
 import numpy as np
 
 class ExchangeEconomyClass:
@@ -54,8 +55,6 @@ class ExchangeEconomyClass:
 
         return eps1, eps2
 
-
-##### Herfra starter den nye kode #####
     def Edgeworth(self):
         # We define the total endowment for both goods:
         w1bar = 1.0
@@ -206,14 +205,13 @@ class ExchangeEconomyClass:
         utility_B_q3 = self.utility_B(x1B_optimal_q3, x2B_optimal_q3)
         print("Utility for consumer B given p1 and optimal allocations:", utility_B_q3)
 
-
     def optimal_allocation_q4a(self):
         N = 75
         p1_range = np.linspace(0.5, 2.5, N+1)
         p2 = 1
 
         max_utility = -np.inf
-        optimal_p1 = np.nan
+        optimal_p1_q4a = np.nan
         xA1_optimal_q4a = np.nan
         xA2_optimal_q4a = np.nan
 
@@ -225,7 +223,7 @@ class ExchangeEconomyClass:
             utility = self.utility_A(x1A, x2A)
             if utility > max_utility:
                 max_utility = utility
-                optimal_p1 = p1
+                optimal_p1_q4a = p1
                 xA1_optimal_q4a = x1A
                 xA2_optimal_q4a = x2A
 
@@ -233,12 +231,12 @@ class ExchangeEconomyClass:
         utility_A_optimal_q4a = self.utility_A(xA1_optimal_q4a, xA2_optimal_q4a)
 
         # Calculate the demand for goods by consumer B with the optimal p1
-        x1B_optimal_q4a, x2B_optimal_q4a = self.demand_B(optimal_p1, p2)
+        x1B_optimal_q4a, x2B_optimal_q4a = self.demand_B(optimal_p1_q4a, p2)
 
         #We calculate the utility for consumer B:
         utility_B_optimal_q4a = self.utility_B(x1B_optimal_q4a, x2B_optimal_q4a)
 
-        print("Optimal p1:", optimal_p1)
+        print("Optimal p1:", optimal_p1_q4a)
         print("Consumer A's optimal allocation: x1A =", xA1_optimal_q4a, "x2A =", xA2_optimal_q4a)
         print("Utility for consumer A:", utility_A_optimal_q4a)
         print("Consumer B's optimal allocation: x1B =", x1B_optimal_q4a, "x2B =", x2B_optimal_q4a)
@@ -272,13 +270,13 @@ class ExchangeEconomyClass:
         result = minimize(max_utility_A_given_B, p1_initial_guess, args=(self.par,))
 
         # Extract the optimal p1 from the result
-        optimal_p1 = result.x[0]
+        optimal_p1_q4b = result.x[0]
 
         # Calculate the demand for goods by consumer B with the optimal p1
-        x1B_optimal_q4b, x2B_optimal_q4b = self.demand_B(optimal_p1, 1)
+        x1B_optimal_q4b, x2B_optimal_q4b = self.demand_B(optimal_p1_q4b, 1)
 
         # Calculate the utility of consumer A with the optimal p1 and optimal demand of B
-        utility_A_optimal_q4b = utility_A(x1B_optimal_q4b, x2B_optimal_q4b, optimal_p1, self.par)
+        utility_A_optimal_q4b = utility_A(x1B_optimal_q4b, x2B_optimal_q4b, optimal_p1_q4b, self.par)
 
         # Calculate the optimal amount of the two goods for consumer A
         x1A_optimal_q4b = 1 - x1B_optimal_q4b
@@ -288,11 +286,11 @@ class ExchangeEconomyClass:
         utility_B_optimal_q4b = self.utility_B(x1B_optimal_q4b, x2B_optimal_q4b)
 
         # Print out the optimal price, utility for both consumers plus both consumers optimal allocations
-        print("Optimal p1:", optimal_p1)
-        print("Consumer B's allocations:", "x1B =", x1B_optimal_q4b, "x2B =", x2B_optimal_q4b)
+        print("Optimal p1:", optimal_p1_q4b)
         print("Utility for consumer A given B's x1B and x2B as well p1:", utility_A_optimal_q4b)
-        print("Consumer A's allocations:", "x1A =", x1A_optimal_q4b, "x2A =", x2A_optimal_q4b)
         print("Utility for consumer B:", utility_B_optimal_q4b)
+        print("Consumer A's allocations:", "x1A =", x1A_optimal_q4b, "x2A =", x2A_optimal_q4b)
+        print("Consumer B's allocations:", "x1B =", x1B_optimal_q4b, "x2B =", x2B_optimal_q4b)
 
     def optimal_allocation_q5a(self):
         # Initialize an empty list to store valid combinations
@@ -400,5 +398,33 @@ class ExchangeEconomyClass:
         p1_q6a = self.par.alpha*self.par.w2A/(x1A_optimal_q6a-self.par.alpha*self.par.w1A)
         print("Optimal price:", p1_q6a)
 
+    def comparing_results(self):
+        #Creating a table to make comparison easier from question 3-5: 
+        # We are defining a list where we can store the values.
+        # This is creating all of the data in each row.
+        questions = ['3', '4a', '4b', '5a', '5b']  # Question numbers from the assignment goes into first column
+        prices = [0.944444460152919, self.optimal_p1_q4a, self.optimal_p1_q4b, self.p1_q5a, self.p1_q5b]  # Prices
+        utility_A = [self.utility_A_q3, self.utility_A_optimal_q4a, self.utility_A_optimal_q4b, self.uA_Z, self.utility_A(x1A_optimal_q5b, x2A_optimal_q5b)]  # Utility for consumer A
+        utility_B = [self.utility_B_q3, self.utility_B_optimal_q4a, self.utility_B_optimal_q4b, self.utility_B(1-xA1_Z, 1-xA2_Z), self.utility_B(1-x1A_optimal_q5b, 1-x2A_optimal_q5b)]  # Utility for consumer B
+        x1A_allocations = [self.x1A_optimal_q3, self.x1A_optimal_q4a, self.x1A_optimal_q4b, self.xA1_Z, self.x1A_optimal_q5b]  # Allocation of x1A
+        x2A_allocations = [self.x2A_optimal_q3, self.x2A_optimal_q4a, self.x2A_optimal_q4b, self.xA2_Z, self.x2A_optimal_q5b]  # Allocation of x2A
+        x1B_allocations = [self.x1B_optimal_q3, self.x1B_optimal_q4a, self.x1B_optimal_q4b, 1-self.xA1_Z, 1-self.x1A_optimal_q5b]  # Allocation of x1B
+        x2B_allocations = [self.x2B_optimal_q3, self.x2B_optimal_q4a, self.x2B_optimal_q4b, 1-self.xA2_Z, 1-self.x2A_optimal_q5b]  # Allocation of x2B
+
+        # We are creating a dictionary to hold data, and naming them after, what they hold.
+        data = {'Question': questions,
+                'Price (p1)': prices,
+                'Utility for Consumer A': utility_A,
+                'Utility for Consumer B': utility_B,
+                'Allocation of x1A': x1A_allocations,
+                'Allocation of x2A': x2A_allocations,
+                'Allocation of x1B': x1B_allocations,
+                'Allocation of x2B': x2B_allocations}
+
+        #We create a DataFrame from the dictionary above, so that we can print it.
+        df = pd.DataFrame(data)
+
+        # We are displaying the DataFrame without index, because we don't want the standard index created by Pyhton
+        print(df.to_string(index=False))
 
 
