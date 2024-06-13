@@ -370,12 +370,35 @@ class ExchangeEconomyClass:
         print("Consumer A's utility with no restrictions:", self.utility_A(x1A_optimal_q5b, x2A_optimal_q5b))
         print("Consumer B's utility:", self.utility_B(1-x1A_optimal_q5b, 1-x2A_optimal_q5b))
 
-        #We calculate the price of good 1 by using the formula given in the assignment for x_1^A where we isolate p1:
+        #We calculate the price using the same method as in q5a:
         p1_q5b = self.par.alpha*self.par.w2A/(x1A_optimal_q5b-self.par.alpha*self.par.w1A)
         print("Optimal price:", p1_q5b)
 
         
+    def optimal_allocation_q6a(self):
+        #We are defining the total utility of both consumer with their intital endownments.
+        uA_initial = self.utility_A(self.par.w1A, self.par.w2A)
+        uB_initial = self.utility_B(self.par.w1B, self.par.w2B)
+        agg_initial = uA_initial + uB_initial
+        print("Aggregated initial utility =", agg_initial)
 
+        #We set the bounds for x1A and x2A, meaning that the allocation can only be between 0 and 1.
+        bounds = [(0, 1), (0, 1)]
+
+        #We perform the optimization using the bounds defined and the constraints above.
+        result = minimize(lambda x: -(self.utility_A(x[0], x[1]) + self.utility_B(1 - x[0], 1 - x[1])), x0=(0.5, 0.5), bounds=bounds)
+
+        #We extract the result that we get into x1A_optimal and x2a_optimal
+        x1A_optimal_q6a, x2A_optimal_q6a = result.x
+
+        #We print out the results
+        print("Aggregated utility for consumer A and B is =", self.utility_A(x1A_optimal_q6a, x2A_optimal_q6a) + self.utility_B(1-x1A_optimal_q6a, 1-x2A_optimal_q6a))
+        print("x1A and x2A are (x1A =", x1A_optimal_q6a,", x2A =", x2A_optimal_q6a, ")")
+        print("x1B and x2B are (x1B =", 1-x1A_optimal_q6a, ", x2B =", 1-x2A_optimal_q6a, ")")
+
+        #We calculate the price using the same method as in q5a:
+        p1_q6a = self.par.alpha*self.par.w2A/(x1A_optimal_q6a-self.par.alpha*self.par.w1A)
+        print("Optimal price:", p1_q6a)
 
 
 
