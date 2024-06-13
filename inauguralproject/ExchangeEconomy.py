@@ -54,11 +54,11 @@ class ExchangeEconomyClass:
 
 
 ##### Herfra starter den nye kode #####
-    def main():
+    def main(self):
         #First we link our notebook (ipynb) to our python file (py) where we have predefined the given utility functions, demand functions and different parameters. Thereby we can extract them from the py file to use in the ipynb file.
-        model = ExchangeEconomyClass()
+        #model = ExchangeEconomyClass()
         #With the following we make it possible to use parameters from our py file by just writing "par" before a parameter.
-        par = model.par
+        #par = model.par
 
         # We define the total endowment for both goods: 
         w1bar = 1.0
@@ -73,15 +73,15 @@ class ExchangeEconomyClass:
         p_imp_good2 = [] 
 
         #We find the utility with the initial endowments:
-        u_A_in = model.utility_A(par.w1A, par.w2A)
-        u_B_in = model.utility_B(1-par.w1A, 1-par.w2A)
+        u_A_in = self.utility_A(self.par.w1A, self.par.w2A)
+        u_B_in = self.utility_B(1-self.par.w1A, 1-self.par.w2A)
 
         #We use a for loop to iterate over the x_grid to find allocations that results in Pareto improvements over the initial endowments.
         #This gives us all the actual combinations of x1A and x2A that are pareto improvements from the initial endowments
         for x1A in x_grid:
             for x2A in x_grid: 
-                utility_A_q1 = model.utility_A(x1A, x2A)
-                utility_B_q1 = model.utility_B(1-x1A, 1-x2A)
+                utility_A_q1 = self.utility_A(x1A, x2A)
+                utility_B_q1 = self.utility_B(1-x1A, 1-x2A)
                 if utility_A_q1 >= u_A_in and utility_B_q1 >= u_B_in:
                     p_imp_good1.append(x1A)
                     p_imp_good2.append(x2A)
@@ -103,7 +103,7 @@ class ExchangeEconomyClass:
         ax_B.invert_yaxis()
 
         #We plot the initial endowment and Pareto improvement lists:
-        ax_A.scatter(par.w1A,par.w2A,marker='s',color='black',label='endowment')
+        ax_A.scatter(self.par.w1A,self.par.w2A,marker='s',color='black',label='endowment')
         ax_A.scatter(p_imp_good1,p_imp_good2,marker='o',color='green',label='possible allocations')
 
         # We define limits for the figure: 
@@ -186,3 +186,4 @@ class ExchangeEconomyClass:
         # Consumer B's utility: 
         utility_B_q3 = self.utility_B(x1B_optimal_q3, x2B_optimal_q3)
         print("Utility for consumer B given p1 and optimal allocations:", utility_B_q3)
+
