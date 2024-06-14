@@ -469,4 +469,82 @@ class ExchangeEconomyClass:
         print(df.to_string(index=False))
        
 
+    def Edgeworth_box_comparison(self):
+        # We define the total endowment for both goods:
+        w1bar = 1.0
+        w2bar = 1.0
+        
+        #We set up the C-restrictions given:
+        N = 75
+        x_grid = np.arange(0, 1, 1/N)
+
+        #We create an empty list for each good to store coordinates of Pareto improvements for goods 1 and 2. These lists will store the x-coordinates and y-coordinates respectively of Pareto improvements found during the loop.
+        p_imp_good1 = []
+        p_imp_good2 = []
+
+        #We find the utility with the initial endowments:
+        u_A_in = self.utility_A(self.par.w1A, self.par.w2A)
+        u_B_in = self.utility_B(1-self.par.w1A, 1-self.par.w2A)
+
+        #We use a for loop to iterate over the x_grid to find allocations that results in Pareto improvements over the initial endowments.
+        #This gives us all the actual combinations of x1A and x2A that are pareto improvements from the initial endowments
+        for x1A in x_grid:
+            for x2A in x_grid:
+                utility_A_q1 = self.utility_A(x1A, x2A)
+                utility_B_q1 = self.utility_B(1-x1A, 1-x2A)
+                if utility_A_q1 >= u_A_in and utility_B_q1 >= u_B_in:
+                    p_imp_good1.append(x1A)
+                    p_imp_good2.append(x2A)
+            
+
+        # We set up the figure for the Edgeworth box:
+        fig = plt.figure(frameon=False,figsize=(6,6), dpi=100)
+        ax_A = fig.add_subplot(1, 1, 1)
+
+        ax_A.set_xlabel("$x_1^A$")
+        ax_A.set_ylabel("$x_2^A$")
+
+        temp = ax_A.twinx()
+        temp.set_ylabel("$x_2^B$")
+        ax_B = temp.twiny()
+        ax_B.set_xlabel("$x_1^B$")
+        ax_B.invert_xaxis()
+        ax_B.invert_yaxis()
+
+        #We plot the initial endowment and Pareto improvement lists:
+        ax_A.scatter(self.par.w1A,self.par.w2A,marker='s',color='black',label='endowment')
+        ax_A.scatter(p_imp_good1,p_imp_good2,marker='o',color='green',label='possible allocations')
+
+        #Here we insert the different allocations that we have have found from question 3-5 into the Edgeworth box.
+        x1A_optimal_q3 = 0.3725490178467546
+        x1A_optimal_q4a = 0.619316843345112
+        x1A_optimal_q4b = 0.6209536860694472
+        xA1_Z = 0.56
+        x1A_optimal_q5b = 0.6808707632770316
+        x2A_optimal_q3 = 0.7037037120815569
+        x2A_optimal_q4a = 0.6408888888888888
+        x2A_optimal_q4b = 0.6400510070645823
+        xA2_Z = 0.8533333333333334
+        x2A_optimal_q5b = 0.7250682829856586
+
+        ax_A.scatter(x1A_optimal_q3,x2A_optimal_q3,marker='s',color='blue',label='q3')
+        ax_A.scatter(x1A_optimal_q4a,x2A_optimal_q4a,marker='s',color='cyan',label='q4A')
+        ax_A.scatter(x1A_optimal_q4b,x2A_optimal_q4b,marker='s',color='yellow',label='q4B')
+        ax_A.scatter(xA1_Z,xA2_Z,marker='s',color='orange',label='q5A')
+        ax_A.scatter(x1A_optimal_q5b,x2A_optimal_q5b,marker='s',color='purple',label='q5B')
+
+        # We define limits for the figure:
+        ax_A.plot([0,w1bar],[0,0],lw=2,color='black')
+        ax_A.plot([0,w1bar],[w2bar,w2bar],lw=2,color='black')
+        ax_A.plot([0,0],[0,w2bar],lw=2,color='black')
+        ax_A.plot([w1bar,w1bar],[0,w2bar],lw=2,color='black')
+
+        ax_A.set_xlim([-0.1, w1bar + 0.1])
+        ax_A.set_ylim([-0.1, w2bar + 0.1])    
+        ax_B.set_xlim([w1bar + 0.1, -0.1])
+        ax_B.set_ylim([w2bar + 0.1, -0.1])
+
+        ax_A.legend(frameon=True,loc='upper right',bbox_to_anchor=(1.7,1.0))
+        plt.show()
+
 
