@@ -7,6 +7,7 @@ from scipy.optimize import minimize
 import pandas as pd
 import numpy as np
 
+
 class ExchangeEconomyClass:
     #Define parameters:
     def __init__(self):
@@ -548,3 +549,65 @@ class ExchangeEconomyClass:
         plt.show()
 
 
+    def market_equilibrium(self):
+        #First we want to just illustrate the endowment from the random drawn set: 
+        #Here we get 50 random values for wA1 and wA2
+        wA1 = np.random.uniform(0, 1, size=50)
+        wA2 = np.random.uniform(0, 1, size=50)
+
+        #We define the function to calculate market equilibrium allocation for a given pair of wA1 and wA2
+        def market_equilibrium_allocation(wA1, wA2):
+            #We define the parameter values:
+            alpha = 1/3  # Parameter alpha
+            beta = 2/3   # Parameter beta
+
+            #We define the demand functions for consumer A and B with wA1 and wA2 that we have defined in the beginning:
+            def demand_A(p1, p2):
+                x1A = alpha*((p1*wA1+p2*wA2)/p1)
+                x2A = (1-alpha)*((p1*wA1+p2*wA2)/p2)
+                return x1A, x2A
+            
+            def demand_B(p1, p2):
+                x1B = beta*((p1*(1-wA1)+p2*(1-wA2))/p1)
+                x2B = (1-beta)*((p1*(1-wA1)+p2*(1-wA2))/p2)
+                return x1B, x2B
+
+            #We define the error functions for market clearing condition with the wA1 and wA2 that we have defined in the beginning:
+            def error1(p1, p2):
+                x1A, x2A = demand_A(p1, p2)
+                x1B, x2B = demand_B(p1, p2)
+                return x1A + x1B - (wA1 + (1 - wA1))  # Market clearing for good 1
+
+            def error2(p1, p2):
+                x1A, x2A = demand_A(p1, p2)
+                x1B, x2B = demand_B(p1, p2)
+                return x2A + x2B - (wA2 + (1 - wA2))  # Market clearing for good 2
+
+            #We find the market equilibrium prices using scipy's root-finding function.
+            #By using the root-finding function it helps us to find the market equilibrium prices by solving the equations representing the excess demand for each good.
+            from scipy.optimize import root
+            result = root(lambda x: [error1(*x), error2(*x)], x0=[1, 1]) #We define a lambda function that incorporates the excess demand equations for both goods (error1 and error2). Furthermore we add our initial guess (x0=[1, 1]) which is need for the root-finding to start its search for p1 and p2.
+            p1, p2 = result.x
+
+            #We calculate the market equilibrium allocations based on the p1 and p2 we found right above.
+            x1A, x2A = demand_A(p1, p2)
+            x1B, x2B = demand_B(p1, p2)
+            return p1, p2, x1A, x2A, x1B, x2B
+
+        #We calculate the market equilibrium allocation for both wA1 and wA2:
+        market_allocations = [market_equilibrium_allocation(w1, w2) for w1, w2 in zip(wA1, wA2)]
+
+        #We extracting allocations for plotting:
+        x1A_values = [allocation[2] for allocation in market_allocations] #It is [2] because it is the 2 element in the return function under where we calculate the market equilibrium allocations based on the p1 and p2.
+        x2A_values = [allocation[3] for allocation in market_allocations] #Same for [3] being 3 element
+
+        #We plot the W set with the market equilibrium allocations:
+        plt.figure(figsize=(8, 6))
+        plt.scatter(wA1, wA2, color='blue', marker='o', label='Set W')
+        plt.scatter(x1A_values, x2A_values, color='red', marker='x', label='Market Equilibrium Allocation')
+        plt.title('Set W with Market Equilibrium Allocation')
+        plt.xlabel('wA1')
+        plt.ylabel('wA2')
+        plt.legend(loc='lower right')
+        plt.grid(True)
+        plt.show()
