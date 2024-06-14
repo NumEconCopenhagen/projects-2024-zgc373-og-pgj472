@@ -23,12 +23,6 @@ class ExchangeEconomyClass:
         par.w1B = 0.2
         par.w2B = 0.7
 
-        # Initialize values here:
-        self.optimal_p1_q4a = None
-        self.optimal_p1_q4b = None
-        self.p1_q5a = None
-        self.p1_q5b = None
-
     #Define utility functions:
     def utility_A(self,x1A,x2A):
         return(x1A**self.par.alpha)*x2A**(1-self.par.alpha)
@@ -244,8 +238,8 @@ class ExchangeEconomyClass:
 
         print("Optimal p1:", optimal_p1_q4a)
         print("Consumer A's optimal allocation: x1A =", xA1_optimal_q4a, "x2A =", xA2_optimal_q4a)
-        print("Utility for consumer A:", utility_A_optimal_q4a)
         print("Consumer B's optimal allocation: x1B =", x1B_optimal_q4a, "x2B =", x2B_optimal_q4a)
+        print("Utility for consumer A:", utility_A_optimal_q4a)
         print("Utility for consumer B:", utility_B_optimal_q4a)
 
     def optimal_allocation_q4b(self):
@@ -406,17 +400,57 @@ class ExchangeEconomyClass:
 
 
     def comparing_results(self):
+        #List of all results to create table: 
+        #Prices:
+        p1_q3 = 0.944444460152919
+        optimal_p1_q4a = 1.8866666666666667
+        optimal_p1_q4b = 1.8992348940312658
+        p1_q5a = 0.34090909090909083
+        p1_q5b = 0.24142687341421534
+        #Utilities:
+        utility_A_q3 = 0.569273589063561
+        utility_A_optimal_q4a = 0.633615985237553
+        utility_A_optimal_q4b = 0.6336208503209155
+        uA_Z = 0.7415523509091093
+        utility_A_optimal_q5b = 0.7100258612285557
+        utility_B_q3 = 0.4886095365292365
+        utility_B_optimal_q4a = 0.37335220631773364
+        utility_B_optimal_q4b = 0.37257053552742647
+        utility_B_optimal_q5a = 0.30507896071427915
+        utility_B_optimal_q5b = 0.30365889718737693
+        #Allocations:
+        x1A_optimal_q3 = 0.3725490178467546
+        x1A_optimal_q4a = 0.619316843345112
+        x1A_optimal_q4b = 0.6209536860694472
+        xA1_Z = 0.56
+        x1A_optimal_q5b = 0.6808707632770316
+        x2A_optimal_q3 = 0.7037037120815569
+        x2A_optimal_q4a = 0.6408888888888888
+        x2A_optimal_q4b = 0.6400510070645823
+        xA2_Z = 0.8533333333333334
+        x2A_optimal_q5b = 0.7250682829856586
+        x1B_optimal_q3 = 0.6274509821532455
+        x1B_optimal_q4a = 0.38068315665488806
+        x1B_optimal_q4b = 0.37904631393055277
+        x1B_optimal_q5a = 0.43999999999999995
+        x1B_optimal_q5b = 0.31912923672296845
+        x2B_optimal_q3 = 0.2962962879184431
+        x2B_optimal_q4a = 0.3591111111111111
+        x2B_optimal_q4b = 0.3599489929354177
+        x2B_optimal_q5a = 0.1466666666666666
+        x2B_optimal_q5b = 0.2749317170143414
+    
         #Creating a table to make comparison easier from question 3-5: 
         # We are defining a list where we can store the values.
         # This is creating all of the data in each row.
         questions = ['3', '4a', '4b', '5a', '5b']  # Question numbers from the assignment goes into first column
-        prices = [0.944444460152919, self.optimal_p1_q4a, self.optimal_p1_q4b, self.p1_q5a, self.p1_q5b]  # Prices
-        utility_A = [self.utility_A_q3, self.utility_A_optimal_q4a, self.utility_A_optimal_q4b, self.uA_Z, self.utility_A(x1A_optimal_q5b, x2A_optimal_q5b)]  # Utility for consumer A
-        utility_B = [self.utility_B_q3, self.utility_B_optimal_q4a, self.utility_B_optimal_q4b, self.utility_B(1-xA1_Z, 1-xA2_Z), self.utility_B(1-x1A_optimal_q5b, 1-x2A_optimal_q5b)]  # Utility for consumer B
-        x1A_allocations = [self.x1A_optimal_q3, self.x1A_optimal_q4a, self.x1A_optimal_q4b, self.xA1_Z, self.x1A_optimal_q5b]  # Allocation of x1A
-        x2A_allocations = [self.x2A_optimal_q3, self.x2A_optimal_q4a, self.x2A_optimal_q4b, self.xA2_Z, self.x2A_optimal_q5b]  # Allocation of x2A
-        x1B_allocations = [self.x1B_optimal_q3, self.x1B_optimal_q4a, self.x1B_optimal_q4b, 1-self.xA1_Z, 1-self.x1A_optimal_q5b]  # Allocation of x1B
-        x2B_allocations = [self.x2B_optimal_q3, self.x2B_optimal_q4a, self.x2B_optimal_q4b, 1-self.xA2_Z, 1-self.x2A_optimal_q5b]  # Allocation of x2B
+        prices = [p1_q3, optimal_p1_q4a, optimal_p1_q4b, p1_q5a, p1_q5b]
+        utility_A = [utility_A_q3, utility_A_optimal_q4a, utility_A_optimal_q4b, uA_Z, utility_A_optimal_q5b] 
+        utility_B = [utility_B_q3, utility_B_optimal_q4a, utility_B_optimal_q4b, utility_B_optimal_q5a, utility_B_optimal_q5b]
+        x1A_allocations = [x1A_optimal_q3, x1A_optimal_q4a, x1A_optimal_q4b, xA1_Z, x1A_optimal_q5b]
+        x2A_allocations = [x2A_optimal_q3, x2A_optimal_q4a, x2A_optimal_q4b, xA2_Z, x2A_optimal_q5b]
+        x1B_allocations = [x1B_optimal_q3, x1B_optimal_q4a, x1B_optimal_q4b, x1B_optimal_q5a, x1B_optimal_q5b]
+        x2B_allocations = [x2B_optimal_q3, x2B_optimal_q4a, x2B_optimal_q4b, x2B_optimal_q5a, x2B_optimal_q5b]
 
         # We are creating a dictionary to hold data, and naming them after, what they hold.
         data = {'Question': questions,
@@ -433,5 +467,6 @@ class ExchangeEconomyClass:
 
         # We are displaying the DataFrame without index, because we don't want the standard index created by Pyhton
         print(df.to_string(index=False))
+       
 
 
