@@ -23,6 +23,12 @@ class ExchangeEconomyClass:
         par.w1B = 0.2
         par.w2B = 0.7
 
+        # Initialize values here:
+        self.optimal_p1_q4a = None
+        self.optimal_p1_q4b = None
+        self.p1_q5a = None
+        self.p1_q5b = None
+
     #Define utility functions:
     def utility_A(self,x1A,x2A):
         return(x1A**self.par.alpha)*x2A**(1-self.par.alpha)
@@ -397,6 +403,7 @@ class ExchangeEconomyClass:
         #We calculate the price using the same method as in q5a:
         p1_q6a = self.par.alpha*self.par.w2A/(x1A_optimal_q6a-self.par.alpha*self.par.w1A)
         print("Optimal price:", p1_q6a)
+
 
     def comparing_results(self):
         #Creating a table to make comparison easier from question 3-5: 
