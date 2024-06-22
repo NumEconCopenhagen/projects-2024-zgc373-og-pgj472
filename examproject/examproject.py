@@ -194,13 +194,13 @@ class ProductionEconomyClass:
         tau, T = params  # Unpack tau and T
         self.par.tau = tau  # Update model parameter
         self.par.T = T  # Update model parameter
-        # Assuming p1 and p2 are determined by some model logic or are constants
-        p1, p2 = 0.976, 1.491  # Example values; adjust as needed
-        SWF = self.calculate_swf(p1, p2)
-        return -SWF  # Minimize this value for optimization
+        for p1 in self.par.p1_range:
+            for p2 in self.par.p2_range:
+                SWF = self.calculate_swf(p1, p2)
+                return -SWF  # Minimize this value for optimization
 
     def optimize_tau_and_T(self):
-        initial_guess = [1.01, 1.01]  # Initial guesses for tau and T
+        initial_guess = [0.01, 0.01]  # Initial guesses for tau and T
         result = minimize(self.swf_optimization_objective_with_T, initial_guess, method='Nelder-Mead')
         optimal_tau, optimal_T = result.x
         optimal_SWF = -result.fun
