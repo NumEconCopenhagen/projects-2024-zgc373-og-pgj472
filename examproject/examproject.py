@@ -6,7 +6,6 @@ from scipy.optimize import minimize
 from scipy.optimize import minimize_scalar
 import pandas as pd
 import numpy as np
-#
 
 class ProductionEconomyClass:
     #Defining parameters:
@@ -127,7 +126,9 @@ class ProductionEconomyClass:
             'l1_star': l1_star,
             'l2_star': l2_star,
             'y1_star': y1_star,
+            'y2_star': y2_star,
             'c1_star': c1_star,
+            'c2_star': c2_star,
             'labor_market_clear': labor_market_clear,
             'good1_market_clear': good1_market_clear,
             'good2_market_clear': good2_market_clear
@@ -181,5 +182,28 @@ class ProductionEconomyClass:
         else:
             raise RuntimeError("Failed to find equilibrium prices")
 
+
+    def calculate_swf(self, p1, p2):
+        equilibrium = self.evaluate_equilibrium(p1, p2)
+        y2_star = equilibrium['y2_star']
+        U = self.sol.utility_star  # Assuming utility_star is updated in evaluate_equilibrium or elsewhere
+        SWF = U - self.par.kappa * y2_star
+        return SWF
+
+    def swf_optimization_objective_with_T(self, params):
+        tau, T = params  # Unpack tau and T
+        self.par.tau = tau  # Update model parameter
+        self.par.T = T  # Update model parameter
+        # Assuming p1 and p2 are determined by some model logic or are constants
+        p1, p2 = 0.976, 1.491  # Example values; adjust as needed
+        SWF = self.calculate_swf(p1, p2)
+        return -SWF  # Minimize this value for optimization
+
+    def optimize_tau_and_T(self):
+        initial_guess = [1.01, 1.01]  # Initial guesses for tau and T
+        result = minimize(self.swf_optimization_objective_with_T, initial_guess, method='Nelder-Mead')
+        optimal_tau, optimal_T = result.x
+        optimal_SWF = -result.fun
+        print(f"Optimal tau: {optimal_tau}, Optimal T: {optimal_T}, Maximized SWF: {optimal_SWF}")
 
 
