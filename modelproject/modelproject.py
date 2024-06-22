@@ -1,4 +1,3 @@
-# imports for the model project:
 from scipy import optimize
 import pandas as pd
 import numpy as np
@@ -19,19 +18,16 @@ class parameters:
 
 # We start by creating a class called cournot which will be used to create our functions
 class duopoly_model:
-    # We define the "init" method which will be used to initialize the parameters of our model
     def __init__(self, a, b, MC):
         self.par = parameters(a, b, MC)
         self.a_slider = widgets.FloatSlider(min=50, max=150, step=1, value=100, description='a:')
         self.b_slider = widgets.FloatSlider(min=5, max=25, step=0.1, value=16, description='b:')
         self.MC_slider = widgets.FloatSlider(min=0.5, max=5, step=0.1, value=4, description='MC:')
         self.sol = SimpleNamespace()
-    
-    # We are adding a method for the interactive plot    
+        
     def interactive_plot(self):    
         widgets.interact(self.update_plot, a=self.a_slider, b=self.b_slider, MC=self.MC_slider)
 
-    # We define the cost function:
     def cost_function(self, qi):
         return self.par.MC * qi
 
@@ -71,7 +67,7 @@ class duopoly_model:
         # We define the objective function for the numerical solution:
         def objective_function(x):
             return self.br1(x) - inv_br2(x)
-        # Initial guess
+        # Our initial guess:
         x0 = 3
         result = root(objective_function, x0)
         return result.x
@@ -98,7 +94,7 @@ class duopoly_model:
         self.par.b = b
         self.par.MC = MC
 
-        # We create a range of quantities produced, ranging from 0 to 10
+        # We create a range of quantities produced
         q = np.linspace(0, 10, 100)
         br1 = [self.br1(qi) for qi in q]
         br2 = [self.br2(qi) for qi in q]
@@ -123,7 +119,6 @@ class duopoly_model:
         plt.legend()
         plt.show()
 
-        # Printing the desired results
         print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity_firm1())
         print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity_firm2())
         print("Total quantity produced in equilibrium:", self.total_equilibrium_quantity())
@@ -134,10 +129,8 @@ class duopoly_model:
 # We create a class called duopoly_model_extension which will be used to extend the duopoly_model class:
 class duopoly_model_extension(duopoly_model):
     def __init__(self):
-        # We initialize the duopoly_model_extension class by calling the "init" method of the duopoly_model class
         super().__init__(100, 16, 0)
     
-    # We define the cost function:
     def cost_function(self, qi):
         return 0
 
@@ -195,7 +188,6 @@ class duopoly_model_extension(duopoly_model):
     
     # We define the update plot function to update the plot with the parameters:
     def plot_duo(self):
-        # We define a new range for the quantities produced
         q = np.linspace(0, self.par.a / self.par.b, 100)
         p_demand = self.par.a - self.par.b * q 
         equilibrium_quantity = self.equilibrium_quantity_firm1() + self.equilibrium_quantity_firm2()
@@ -223,7 +215,6 @@ class duopoly_model_extension(duopoly_model):
     def producer_surplus_duo(self):
         return 33.33 * (self.equilibrium_quantity_firm1()+self.equilibrium_quantity_firm2())
 
-    # We print the desired results:
     def print_results(self, q1, q2):
         print("Quantity produced by firm 1 in equilibrium:", self.equilibrium_quantity_firm1())
         print("Quantity produced by firm 2 in equilibrium:", self.equilibrium_quantity_firm2())
@@ -273,7 +264,6 @@ class monopoly_model_extension(duopoly_model):
 
     # We define the numerical solution to the Cournot-Nash equilibrium quantity:
     def solve_numerical_mon(self):
-        # Initial guess
         x0 = 3
         result = optimize.minimize(lambda x: -self.profit_function(x), x0)
         
@@ -292,10 +282,10 @@ class monopoly_model_extension(duopoly_model):
         plt.figure(figsize=(8, 6))
         plt.plot(q, p_demand, label='Demand')
         plt.axvline(x=equilibrium_quantity, color='r', linestyle='-', label='Supply')
-        plt.axhline(y=50, color='g', linestyle='--', label='Price at 50')  # horizontal line at price 50
-        plt.scatter(equilibrium_quantity, equilibrium_price, color='b')  # intersection point
+        plt.axhline(y=50, color='g', linestyle='--', label='Price at 50')
+        plt.scatter(equilibrium_quantity, equilibrium_price, color='b')
         plt.text(equilibrium_quantity + 0.20 * (self.par.a / self.par.b), equilibrium_price + 0.05 * self.par.a, 
-                f'({equilibrium_quantity:.2f}, {equilibrium_price:.2f})', horizontalalignment='right')  # text indicating the intersection point
+                f'({equilibrium_quantity:.2f}, {equilibrium_price:.2f})', horizontalalignment='right')
         plt.xlabel('Quantity')
         plt.ylabel('Price')
         plt.title('Inverse Demand and Supply Curves')
@@ -310,7 +300,6 @@ class monopoly_model_extension(duopoly_model):
     def producer_surplus_mon(self):
         return 50 * self.equilibrium_quantity_monopoly()
 
-    # We print the desired results:
     def print_results(self):
         print("Quantity produced per firm:", self.quantity_per_firm())
         print("Total quantity produced::", self.equilibrium_quantity_monopoly())
@@ -319,18 +308,15 @@ class monopoly_model_extension(duopoly_model):
 
     # We define the print_results_table function to print the results in a table for both cases of the extended model:
     def print_results_table(self, duopoly_model_extension, monopoly_model_extension):
-        # We create a PrettyTable object for our table
         table = PrettyTable()
 
         # We set the column names
         table.field_names = ["", "Duopoly Extension Model", "Monopoly Extension Model"]
 
-        # We add the different rows that we want in the table.
         table.add_row(["Quantity Produced", f"{duopoly_model_extension.equilibrium_quantity_firm1() + duopoly_model_extension.equilibrium_quantity_firm2():.3f}", f"{monopoly_model_extension.equilibrium_quantity_monopoly():.3f}"])
         table.add_row(["Price", f"{duopoly_model_extension.equilibrium_price():.3f}", f"{monopoly_model_extension.price_monopoly():.3f}"])
         table.add_row(["Profit", f"{duopoly_model_extension.profit_function1(2.083, 2.083):.3f}", f"{monopoly_model_extension.profit_per_firm(3.125):.3f}"])
         table.add_row(["Consumer Surplus", f"{duopoly_model_extension.consumer_surplus_duo():.3f}", f"{monopoly_model_extension.consumer_surplus_mon():.3f}"])
         table.add_row(["Producer Surplus", f"{duopoly_model_extension.producer_surplus_duo():.3f}", f"{monopoly_model_extension.producer_surplus_mon():.3f}"])
-
-        # We print out the table
+        
         print(table)
