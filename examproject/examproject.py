@@ -34,42 +34,61 @@ class ProductionEconomyClass:
     #Creating the linspaces given: 
         self.p1_range = np.linspace(0.1, 2.0, 10)
         self.p2_range = np.linspace(0.1, 2.0, 10)
+        self.l_range = np.linspace(0.1, 10, 10)
 
 
     #We start by defining all the functions given so we can use them later on: 
     #We define the optimal firm behaviour functions: 
-    def l_j_star(self, p_j):
+    def l1_star(self, p1):
         par = self.par
-        return (p_j * par.A * par.gamma / par.w) ** (1 / (1 - par.gamma))
+        return (p1 * par.A * par.gamma / par.w) ** (1 / (1 - par.gamma))
     
-    def y_j_star(self, p_j):
+    def l2_star(self, p2):
         par = self.par
-        return par.A * self.l_j_star(p_j) ** par.gamma
+        return (p2 * par.A * par.gamma / par.w) ** (1 / (1 - par.gamma))
+
+    def y1_star(self, p1):
+        par = self.par
+        return par.A * self.l1_star(p1) ** par.gamma
+    
+    def y2_star(self, p2):
+        par = self.par
+        return par.A * self.l2_star(p2) ** par.gamma
 
     #We define the implied profit function:
-    def pi_j_star(self, p_j):
+    def pi1_star(self, p1):
         par = self.par
-        return (1 - par.gamma) / par.gamma * par.w * self.l_j_star(p_j)
+        return (1 - par.gamma) / par.gamma * par.w * self.l1_star(p1)
+    
+    def pi2_star(self, p2):
+        par = self.par
+        return (1 - par.gamma) / par.gamma * par.w * self.l2_star(p2)
     
     #We define the optimal consumption functions:
-    def consumption(self, l, p1, p2):
+    def consumption1(self, l, p1, p2):
         par = self.par
-        pi1 = self.pi_j_star(p1)
-        pi2 = self.pi_j_star(p2)
+        pi1 = self.pi1_star(p1)
+        pi2 = self.pi2_star(p2)
         c1 = par.alpha * (par.w * l + par.T + pi1 + pi2) / p1
+        return c1
+    
+    def consumption2(self, l, p1, p2):
+        par = self.par
+        pi1 = self.pi1_star(p1)
+        pi2 = self.pi2_star(p2)
         c2 = (1-par.alpha) * (par.w * l + par.T + pi1 + pi2) / p2 + par.tau
-        return c1, c2
+        return c2
     
     #We define the single consumer utility function:
     def utility(self, l, p1, p2):
         par = self.par
         #Including the given optimal consumption:
-        c1, c2 = self.consumption(l, p1, p2)
-        
+        c1, c2 = self.consumption1(l, p1, p2), self.consumption2(l, p1, p2)
+
         #We then calculate the utility. Because we use the given optimal consumption functions we are implicitly satisfying the budget constraint.
-        utility = np.log(c1 ** par.alpha * c2 ** (1 - par.alpha)) - par.nu * (l ** (1 + par.epsilon)) / (1 + par.epsilon)
+        utility_calc = np.log(c1 ** par.alpha * c2 ** (1 - par.alpha)) - par.nu * (l ** (1 + par.epsilon)) / (1 + par.epsilon)
         
-        return utility
+        return utility_calc
 
     #Before we can check for market clearing we need to find the optimal labor supply for each consumer. We use the given optimal behavior function:
     def find_optimal_labor(self, p1, p2):
@@ -82,9 +101,9 @@ class ProductionEconomyClass:
         for p1 in self.p1_range:
             for p2 in self.p2_range:
                 optimal_labor = self.find_optimal_labor(p1, p2)
-                c1_demand, c2_demand = self.consumption(optimal_labor, p1, p2)
-                y1_supply = self.y_j_star(p1)
-                y2_supply = self.y_j_star(p2)
+                c1_demand, c2_demand = self.consumption1(optimal_labor, p1, p2), self.consumption2(optimal_labor, p1, p2)
+                y1_supply = self.y1_star(p1)
+                y2_supply = self.y2_star(p2)
                 
                 if np.isclose(c1_demand, y1_supply) and np.isclose(c2_demand, y2_supply):
                     market_clearing_prices.append((p1, p2))
