@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 class ProductionEconomyClass:
-    #Defining parameters:
+    #We define parameters:
     def __init__(self):
         par = self.par = SimpleNamespace()
         
@@ -43,7 +43,7 @@ class ProductionEconomyClass:
 
 
     #We start by defining all the functions given so we can use them later on: 
-    #We define the optimal firm behaviour functions: 
+    #We define the optimal labour function for the firms: 
     def optimal_labor_firms(self, pj):
         """ Calculate optimal labor for a given price """
         par = self.par
@@ -55,11 +55,11 @@ class ProductionEconomyClass:
         par = self.par
         return par.A * l_star ** par.gamma
     
+    #We define the implied profits function for the firms:
     def implied_profits_firms(self, pj, l_star):
         """ Calculate implied profits for a given price and labor """
         par = self.par
         return (1 - par.gamma) / par.gamma * par.w * l_star
-
 
     #We define the consumers optimal consumption functions:
     def optimal_consumption_cs(self, l, p1, p2, pi1, pi2):
@@ -74,6 +74,7 @@ class ProductionEconomyClass:
     def utility(self, l, p1, p2):
         """ Utility function """
         par = self.par
+        #We store the optimal values from the functions above:
         l1_star = self.optimal_labor_firms(p1)
         l2_star = self.optimal_labor_firms(p2)
         y1_star = self.optimal_output_firms(l1_star)
@@ -87,7 +88,7 @@ class ProductionEconomyClass:
     def find_optimal_labor(self, p1, p2):
         """ Find optimal labor supply by maximizing the utility function """
         sol = self.sol
-
+        #We define an objective function to minimize:
         def obj(l):
             return -self.utility(l, p1, p2)
 
@@ -96,7 +97,7 @@ class ProductionEconomyClass:
         if not res.success:
             raise RuntimeError(f"Optimization failed: {res.message}")
         
-        # Save results
+        #We save results
         sol.l_star = res.x
         sol.utility_star = -res.fun
         return sol.l_star
@@ -134,17 +135,18 @@ class ProductionEconomyClass:
             'good2_market_clear': good2_market_clear
         }
 
+    # We check the market clearing conditions for all combinations of p1 and p2 by looping through the ranges given:
     def check_market_clearing(self):
         """ Check market clearing conditions for all combinations of p1 and p2 """
         par = self.par
         results = []
-        market_clearing_found = False  # Flag to track if any market clearing condition is met
+        market_clearing_found = False 
 
         for p1 in par.p1_range:
             for p2 in par.p2_range:
                 result = self.evaluate_equilibrium(p1, p2)
                 results.append(result)
-                # Check if any market clearing condition is met
+                #We check if any market clearing condition is met
                 if result['labor_market_clear'] or result['good1_market_clear'] or result['good2_market_clear']:
                     market_clearing_found = True
                     print(f"p1: {result['p1']}, p2: {result['p2']}, "
@@ -157,22 +159,21 @@ class ProductionEconomyClass:
 
         return results
 
-
+    #We calculate the equilibrium prices:
     def find_equilibrium_prices(self):
-        # Step 1: Define initial guess for p1 and p2
-        initial_guess = [1.0, 1.0]  # Example initial guess
+        #We define the initial guesses for the prices:
+        initial_guess = [1.0, 1.0]
 
-        # Step 2: Define the objective function to minimize
+        # We Define the objective function to minimize
         def objective(prices):
             p1, p2 = prices
             result = self.evaluate_equilibrium(p1, p2)
-            # Use absolute values of market imbalances as the objective to minimize
-            labor_market_imbalance = abs(result['l_star'] - (result['l1_star'] + result['l2_star']))
-            good1_market_imbalance = abs(result['c1_star'] - result['y1_star'])
+            labor_market_clearing = abs(result['l_star'] - (result['l1_star'] + result['l2_star']))
+            good1_market_clearing = abs(result['c1_star'] - result['y1_star'])
             # No need to check good2_market_imbalance due to Walras' law
-            return labor_market_imbalance + good1_market_imbalance
+            return labor_market_clearing + good1_market_clearing
 
-        # Step 3: Use an optimization algorithm to find equilibrium prices
+        # We use an optimization algorithm to find equilibrium prices
         result = optimize.minimize(objective, initial_guess, method='Nelder-Mead')
 
         if result.success:
@@ -182,25 +183,28 @@ class ProductionEconomyClass:
         else:
             raise RuntimeError("Failed to find equilibrium prices")
 
-
+    # We calculate the social welfare function
     def calculate_swf(self, p1, p2):
         equilibrium = self.evaluate_equilibrium(p1, p2)
         y2_star = equilibrium['y2_star']
-        U = self.sol.utility_star  # Assuming utility_star is updated in evaluate_equilibrium or elsewhere
+        U = self.sol.utility_star
         SWF = U - self.par.kappa * y2_star
         return SWF
 
+    # We optimize the social welfare function
     def swf_optimization_objective_with_T(self, params):
-        tau, T = params  # Unpack tau and T
-        self.par.tau = tau  # Update model parameter
-        self.par.T = T  # Update model parameter
+        tau, T = params 
+        self.par.tau = tau 
+        self.par.T = T
         for p1 in self.par.p1_range:
             for p2 in self.par.p2_range:
                 SWF = self.calculate_swf(p1, p2)
-                return -SWF  # Minimize this value for optimization
+                return -SWF 
 
+    # We find the optimal value og tau, T and SWF
     def optimize_tau_and_T(self):
-        initial_guess = [0.01, 0.01]  # Initial guesses for tau and T
+        # We set initial guesses for tau and T
+        initial_guess = [0.01, 0.01]
         result = minimize(self.swf_optimization_objective_with_T, initial_guess, method='Nelder-Mead')
         optimal_tau, optimal_T = result.x
         optimal_SWF = -result.fun
