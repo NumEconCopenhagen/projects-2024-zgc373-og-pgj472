@@ -123,6 +123,11 @@ class ProductionEconomyClass:
         return {
             'p1': p1,
             'p2': p2,
+            'l_star': l_star,
+            'l1_star': l1_star,
+            'l2_star': l2_star,
+            'y1_star': y1_star,
+            'c1_star': c1_star,
             'labor_market_clear': labor_market_clear,
             'good1_market_clear': good1_market_clear,
             'good2_market_clear': good2_market_clear
@@ -152,14 +157,29 @@ class ProductionEconomyClass:
         return results
 
 
+    def find_equilibrium_prices(self):
+        # Step 1: Define initial guess for p1 and p2
+        initial_guess = [1.0, 1.0]  # Example initial guess
 
+        # Step 2: Define the objective function to minimize
+        def objective(prices):
+            p1, p2 = prices
+            result = self.evaluate_equilibrium(p1, p2)
+            # Use absolute values of market imbalances as the objective to minimize
+            labor_market_imbalance = abs(result['l_star'] - (result['l1_star'] + result['l2_star']))
+            good1_market_imbalance = abs(result['c1_star'] - result['y1_star'])
+            # No need to check good2_market_imbalance due to Walras' law
+            return labor_market_imbalance + good1_market_imbalance
 
+        # Step 3: Use an optimization algorithm to find equilibrium prices
+        result = optimize.minimize(objective, initial_guess, method='Nelder-Mead')
 
-
-
-
-
-
+        if result.success:
+            equilibrium_prices = result.x
+            print(f"Equilibrium prices found: p1 = {equilibrium_prices[0]}, p2 = {equilibrium_prices[1]}")
+            return equilibrium_prices
+        else:
+            raise RuntimeError("Failed to find equilibrium prices")
 
 
 
