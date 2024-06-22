@@ -10,7 +10,7 @@ class CareerChoiceModelClass():
         par.sigma = 2
         par.v = np.array([1, 2, 3])
 
-    def simulate_and_calculate_utilities(self):
+    def simulation_q1(self):
         # Initialize arrays to store results
         expected_utilities = np.zeros(self.par.J)
         average_realized_utilities = np.zeros(self.par.J)
