@@ -1,3 +1,7 @@
+#We have used the Copilot as permitted as a tool to adjust and correct our code when solving the problem. 
+#We write in the code below the parts where we have mainly copied the code from the Copilot.
+
+#Us writing the code:
 import numpy as np
 from types import SimpleNamespace
 import matplotlib.pyplot as plt
@@ -56,6 +60,7 @@ class CareerChoiceModelClass():
                 graduate_noise = np.random.normal(0, self.par.sigma**2, self.par.J)
                 #Next we do the step that each person i chooses the career track with the highest expected utility. We use the np.argmax:
                 highest_utility_career = np.argmax(prior_expected_utilities)
+                #For the next piece we used copilot to generate the code:
                 #First we store the chosen career $j^k*_i$ 
                 chosen_careers[i, highest_utility_career, k] = 1
                 #Next we store the prior expectation of the value of their chosen career:
@@ -63,12 +68,13 @@ class CareerChoiceModelClass():
                 #Lastly we store the realized value of their chosen career track:
                 realized_utilities[i, k] = self.par.v_j[highest_utility_career] + graduate_noise[highest_utility_career]
 
+        #Us writing the code: 
         #We calculate the average proportion of times each career is chosen by the graduates and the average expected and realized utilities for each graduate type:
         career_shares = np.mean(chosen_careers, axis=2)
         avg_expected_utilities = np.mean(expected_utilities, axis=1)
         avg_realized_utilities = np.mean(realized_utilities, axis=1)
 
-
+        #For the following plot we used copilot to generate the code: 
         #Plot 1: Share of Graduates Choosing Each Career
         for j in range(self.par.J):
             plt.plot(range(1, self.par.N+1), career_shares[:, j], label=f'Career {j+1}')
@@ -94,6 +100,8 @@ class CareerChoiceModelClass():
         plt.legend()
         plt.show()
 
+
+    #Us writing the code: 
     #We will use the same approach as in q2, which is why the code will be very similar to the code provided in q2:
     def simulation_q3(self):
         #We create arrays to store our results
@@ -119,6 +127,8 @@ class CareerChoiceModelClass():
                 chosen_careers[i, initial_career, k] = 1
                 expected_utilities[i, k] = prior_expected_utilities[initial_career]
                 realized_utilities[i, k] = self.par.v[initial_career] + graduate_noise[initial_career]
+
+                #We used copilot for the next part: 
                 #Here we create the extra loop for the new career choice options after a year:
                 new_prior_expected_utilities = np.zeros(self.par.J)
                 for j in range(self.par.J):
@@ -136,6 +146,7 @@ class CareerChoiceModelClass():
                 if new_career != initial_career:
                     switch_decisions[i, initial_career] += 1
 
+        #Us writing the code:
         #We calculate the average proportion of times each career is chosen by the graduates and the average expected and realized utilities for each graduate type:
         career_shares = np.mean(chosen_careers, axis=2)
         avg_expected_utilities = np.mean(expected_utilities, axis=1)
@@ -145,6 +156,7 @@ class CareerChoiceModelClass():
         new_avg_realized_utilities = np.mean(new_realized_utilities, axis=1)
         switch_proportions = switch_decisions / self.par.K
 
+        #For the following plot we used copilot to generate the code: 
         #We start by plotting the career shares old and new:
         for j in range(self.par.J):
             plt.plot(career_shares[:, j], label=f'Initial Career Shares {j+1}')
