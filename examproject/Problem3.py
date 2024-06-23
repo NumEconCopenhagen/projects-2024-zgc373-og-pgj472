@@ -13,7 +13,8 @@ class BarycentricClass:
         par.y = par.rng.uniform(size=(2,))
         
         # Example function f(x1, x2)
-        par.f = lambda x1, x2: np.sin(np.pi * x1) * np.cos(np.pi * x2)
+        par.f = lambda x: x[0] * x[1]
+        par.F = np.array([par.f(x) for x in par.X])
 
     # Function to compute the Euclidean distance
     def euclidean_distance(self, p1, p2):
@@ -72,12 +73,12 @@ class BarycentricClass:
         # Check if y is inside triangle ABC
         r1, r2, r3, inside_ABC = self.is_inside_triangle(A, B, C, y)
         if inside_ABC:
-            return r1 * f(A[0], A[1]) + r2 * f(B[0], B[1]) + r3 * f(C[0], C[1])
+            return r1 * f(A) + r2 * f(B) + r3 * f(C)
 
         # Check if y is inside triangle CDA
         r1, r2, r3, inside_CDA = self.is_inside_triangle(C, D, A, y)
         if inside_CDA:
-            return r1 * f(C[0], C[1]) + r2 * f(D[0], D[1]) + r3 * f(A[0], A[1])
+            return r1 * f(C) + r2 * f(D) + r3 * f(A)
         
         return float('nan')
 
@@ -118,11 +119,8 @@ class BarycentricClass:
         print(f"Barycentric coordinates for triangle CDA: {r_CDA}")
 
         inside_ABC = 0 <= r_ABC[0] <= 1 and 0 <= r_ABC[1] <= 1 and 0 <= r_ABC[2] <= 1
-        inside_CDA = 0 <= r_CDA[0] <= 1 and 0 <= r_CDA[1] <= 1 and 0 <= r_CDA[2] <= 1
 
         if inside_ABC:
             print("Point y is inside triangle ABC.")
-
-
 
 
