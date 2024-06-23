@@ -122,11 +122,7 @@ class BarycentricClass:
 
         if inside_ABC:
             print("Point y is inside triangle ABC.")
-            return r_ABC, "ABC"
-        elif inside_CDA:
-            print("Point y is inside triangle CDA.")
-            return r_CDA, "CDA"
-        else:
-            print("Point y is not inside triangles ABC or CDA.")
-            return "NaN", "NaN"
+
+
+
 
