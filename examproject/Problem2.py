@@ -11,6 +11,7 @@ class CareerChoiceModelClass():
         par.sigma = 2
         par.v = np.array([1, 2, 3])
         par.v_j = np.random.choice([1, 2, 3], par.J)
+        par.c = 1
 
     def simulation_q1(self):
         #We create two arrays to store our results
@@ -62,7 +63,7 @@ class CareerChoiceModelClass():
                 #Lastly we store the realized value of their chosen career track:
                 realized_utilities[i, k] = self.par.v_j[highest_utility_career] + graduate_noise[highest_utility_career]
 
-        #We calculate the average proportion of times each career is chosen by the graduates:
+        #We calculate the average proportion of times each career is chosen by the graduates and the average expected and realized utilities for each graduate type:
         career_shares = np.mean(chosen_careers, axis=2)
         avg_expected_utilities = np.mean(expected_utilities, axis=1)
         avg_realized_utilities = np.mean(realized_utilities, axis=1)
@@ -91,5 +92,93 @@ class CareerChoiceModelClass():
         plt.xlabel('Graduate Type')
         plt.ylabel('Utility')
         plt.legend()
+        plt.show()
+
+    #We will use the same approach as in q2, which is why the code will be very similar to the code provided in q2:
+    def simulation_q3(self):
+        #We create arrays to store our results
+        chosen_careers = np.zeros((self.par.N, self.par.J, self.par.K))
+        expected_utilities = np.zeros((self.par.N, self.par.K))
+        realized_utilities = np.zeros((self.par.N, self.par.K))
+        new_chosen_careers = np.zeros((self.par.N, self.par.J, self.par.K))
+        new_expected_utilities = np.zeros((self.par.N, self.par.K))
+        new_realized_utilities = np.zeros((self.par.N, self.par.K))
+        switch_decisions = np.zeros((self.par.N, self.par.J))
+
+        #We use the same style of loop, but now we add an extra loop for the new career choice options:
+        for k in range(self.par.K):
+            for i in range(self.par.N):
+                Fi = i + 1 
+                prior_expected_utilities = np.zeros(self.par.J)
+                for j in range(self.par.J):
+                    friends_noise = np.random.normal(0, self.par.sigma**2, Fi)
+                    prior_expected_utilities[j] = np.mean(self.par.v_j[j] + friends_noise)
+                graduate_noise = np.random.normal(0, self.par.sigma**2, self.par.J)
+                #Next, we calculate the highest expected utility given career choices:
+                initial_career = np.argmax(prior_expected_utilities)
+                chosen_careers[i, initial_career, k] = 1
+                expected_utilities[i, k] = prior_expected_utilities[initial_career]
+                realized_utilities[i, k] = self.par.v[initial_career] + graduate_noise[initial_career]
+                #Here we create the extra loop for the new career choice options after a year:
+                new_prior_expected_utilities = np.zeros(self.par.J)
+                for j in range(self.par.J):
+                    if j == initial_career:
+                        new_prior_expected_utilities[j] = realized_utilities[i, k]
+                    else:
+                        new_prior_expected_utilities[j] = prior_expected_utilities[j] - self.par.c
+                #We find the highest utility for the new career choice options:
+                new_career = np.argmax(new_prior_expected_utilities)
+                new_chosen_careers[i, new_career, k] = 1
+                new_expected_utilities[i, k] = new_prior_expected_utilities[new_career]
+                #The last part of this code, says that the graduate will only switch career if the new career has a higher expected utility than the initial career:
+                new_realized_utilities[i, k] = self.par.v_j[new_career] + graduate_noise[new_career] - (self.par.c if new_career != initial_career else 0)
+                #Here we say that if the new career is different from the initial career, then the graduate will switch their career:
+                if new_career != initial_career:
+                    switch_decisions[i, initial_career] += 1
+
+        #We calculate the average proportion of times each career is chosen by the graduates and the average expected and realized utilities for each graduate type:
+        career_shares = np.mean(chosen_careers, axis=2)
+        avg_expected_utilities = np.mean(expected_utilities, axis=1)
+        avg_realized_utilities = np.mean(realized_utilities, axis=1)
+        new_career_shares = np.mean(new_chosen_careers, axis=2)
+        new_avg_expected_utilities = np.mean(new_expected_utilities, axis=1)
+        new_avg_realized_utilities = np.mean(new_realized_utilities, axis=1)
+        switch_proportions = switch_decisions / self.par.K
+
+        #We start by plotting the career shares old and new:
+        for j in range(self.par.J):
+            plt.plot(career_shares[:, j], label=f'Initial Career Shares {j+1}')
+            plt.plot(new_career_shares[:, j], label=f'New Career Shares {j+1}', linestyle='--')
+        plt.legend()
+        plt.title('Career Shares Comparison')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Share')
+        plt.show()
+
+        #Second, we plot the expected utilities old and new:
+        plt.plot(avg_expected_utilities, label='Initial Expected Utility')
+        plt.plot(new_avg_expected_utilities, label='New Expected Utility')
+        plt.legend()
+        plt.title('Average Expected Utility Over Time')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Utility')
+        plt.show()
+
+        #Third, we plot the realized utilities old and new:
+        plt.plot(avg_realized_utilities, label='Initial Realized Utility')
+        plt.plot(new_avg_realized_utilities, label='New Realized Utility')
+        plt.legend()
+        plt.title('Average Realized Utility Over Time')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Utility')
+        plt.show()
+       
+        #Fourth, we plot the switch decisions:
+        for j in range(self.par.J):
+            plt.plot(switch_proportions[:, j], label=f'Career {j+1}')
+        plt.legend()
+        plt.title('Proportion of Switch Decisions Over Time')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Proportion')
         plt.show()
 
