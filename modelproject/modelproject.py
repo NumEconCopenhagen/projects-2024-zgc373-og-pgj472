@@ -321,5 +321,3 @@ class monopoly_model_extension(duopoly_model):
         
         print(table)
 
-
-#TEST before upload 
