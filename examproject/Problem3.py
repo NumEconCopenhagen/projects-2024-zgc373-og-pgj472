@@ -124,3 +124,17 @@ class BarycentricClass:
             print("Point y is inside triangle ABC.")
 
 
+    def evaluate_points_in_Y(self): 
+        Y = [(0.2, 0.2), (0.8, 0.2), (0.8, 0.8), (0.5, 0.5)] 
+        results = [] 
+        
+        for y in Y: 
+            self.par.y = y
+            interpolated_value = self.interpolate()
+            true_value = self.par.f(y)
+            results.append((y, true_value, interpolated_value)) 
+            print(f"For point y = {y}:") 
+            print(f"True value of f(y): {true_value}") 
+            print(f"Interpolated value of f(y): {interpolated_value}") 
+            print() 
+            
