@@ -155,17 +155,17 @@ class StockData:
         if number == "two":
             # Using the two stocks
             stocks = ['AAPL', 'CVX']
-            # Calculating the covariance matrix
+            #We calculate the covariance matrix
             covariance_matrix = self.calculate_covariance("two")
         elif number == "four":
             # Using the four stocks
             stocks = ['AAPL', 'CVX', 'KO', 'JNJ']
-            # Calculating the covariance matrix
+            #We calculate the covariance matrix
             covariance_matrix = self.calculate_covariance("four")
         elif number == "six":
             # Using the six stocks
             stocks = ['AAPL', 'CVX', 'KO', 'JNJ', 'BAC', 'NKE']
-            # Calculating the covariance matrix
+            #We calculate the covariance matrix
             covariance_matrix = self.calculate_covariance("six")
 
         # We calculate the inverse covariance matrix using the numpy function np.linalg.inv
