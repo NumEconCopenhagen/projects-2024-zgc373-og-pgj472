@@ -35,55 +35,61 @@ class CareerChoiceModelClass():
 
 
     def simulation_q2(self):
-        # Initialize storage
+        #We create three arrays to store our results
+        #chosen_careers is a 3D array.
         chosen_careers = np.zeros((self.par.N, self.par.J, self.par.K))
+        #Whereas expected_utilities and realized_utilities are 2D arrays, because they only need to store the utility for the career that is actually chosen by each graduate in each simulation, so they don't need the self.par.J:
         expected_utilities = np.zeros((self.par.N, self.par.K))
         realized_utilities = np.zeros((self.par.N, self.par.K))
 
-        # Simulation
+        #First we loop over the 10.000 simulations
         for k in range(self.par.K):
+            #Next we loop over each graduate i including the condition that each graduate has i + 1 friends.
             for i in range(self.par.N):
-                Fi = i + 1  # Number of friends for graduate i
+                Fi = i + 1 
+                #We create an empty array to store the prior expected utilities that we find doing the loop:
                 prior_expected_utilities = np.zeros(self.par.J)
                 for j in range(self.par.J):
                     friends_noise = np.random.normal(0, self.par.sigma**2, Fi)
                     prior_expected_utilities[j] = np.mean(self.par.v_j[j] + friends_noise)
-                personal_noise = np.random.normal(0, self.par.sigma**2, self.par.J)
+                graduate_noise = np.random.normal(0, self.par.sigma**2, self.par.J)
                 #Next we do the step that each person i chooses the career track with the highest expected utility. We use the np.argmax:
-                chosen_career = np.argmax(prior_expected_utilities)
+                highest_utility_career = np.argmax(prior_expected_utilities)
                 #First we store the chosen career $j^k*_i$ 
-                chosen_careers[i, chosen_career, k] = 1
+                chosen_careers[i, highest_utility_career, k] = 1
                 #Next we store the prior expectation of the value of their chosen career:
-                expected_utilities[i, k] = prior_expected_utilities[chosen_career]
+                expected_utilities[i, k] = prior_expected_utilities[highest_utility_career]
                 #Lastly we store the realized value of their chosen career track:
-                realized_utilities[i, k] = self.par.v_j[chosen_career] + personal_noise[chosen_career]
+                realized_utilities[i, k] = self.par.v_j[highest_utility_career] + graduate_noise[highest_utility_career]
 
-        # Calculate averages for plotting:
+        #We calculate the average proportion of times each career is chosen by the graduates:
         career_shares = np.mean(chosen_careers, axis=2)
-        average_expected_utilities = np.mean(expected_utilities, axis=1)
-        average_realized_utilities = np.mean(realized_utilities, axis=1)
+        avg_expected_utilities = np.mean(expected_utilities, axis=1)
+        avg_realized_utilities = np.mean(realized_utilities, axis=1)
 
-        # Visualization
-        fig, axs = plt.subplots(3, 1, figsize=(10, 15))
+
+        #Plot 1: Share of Graduates Choosing Each Career
         for j in range(self.par.J):
-            axs[0].plot(range(1, self.par.N+1), career_shares[:, j], label=f'Career {j+1}')
-        axs[0].set_title('Share of Graduates Choosing Each Career')
-        axs[0].set_xlabel('Graduate Type')
-        axs[0].set_ylabel('Share')
-        axs[0].legend()
+            plt.plot(range(1, self.par.N+1), career_shares[:, j], label=f'Career {j+1}')
+        plt.title('Share of Graduates Choosing Each Career')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Share')
+        plt.legend()
+        plt.show()
 
-        axs[1].plot(range(1, self.par.N+1), average_expected_utilities, label='Average Expected Utility')
-        axs[1].set_title('Average Subjective Expected Utility')
-        axs[1].set_xlabel('Graduate Type')
-        axs[1].set_ylabel('Utility')
-        axs[1].legend()
+        #Plot 2: Average Subjective Expected Utility
+        plt.plot(range(1, self.par.N+1), avg_expected_utilities, label='Average Expected Utility')
+        plt.title('Average Subjective Expected Utility')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Utility')
+        plt.legend()
+        plt.show()
 
-        axs[2].plot(range(1, self.par.N+1), average_realized_utilities, label='Average Realized Utility')
-        axs[2].set_title('Average Ex Post Realized Utility')
-        axs[2].set_xlabel('Graduate Type')
-        axs[2].set_ylabel('Utility')
-        axs[2].legend()
-
-        plt.tight_layout()
+        #Plot 3: Average Ex Post Realized Utility
+        plt.plot(range(1, self.par.N+1), avg_realized_utilities, label='Average Realized Utility')
+        plt.title('Average Ex Post Realized Utility')
+        plt.xlabel('Graduate Type')
+        plt.ylabel('Utility')
+        plt.legend()
         plt.show()
 
