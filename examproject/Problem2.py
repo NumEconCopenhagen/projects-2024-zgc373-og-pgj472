@@ -13,25 +13,23 @@ class CareerChoiceModelClass():
         par.v_j = np.random.choice([1, 2, 3], par.J)
 
     def simulation_q1(self):
-        # Initialize arrays to store results
+        #We create two arrays to store our results
         expected_utilities = np.zeros(self.par.J)
         average_realized_utilities = np.zeros(self.par.J)
 
-        # Simulate and calculate utilities
+        #Next we loop over each career choice to simulate and calculate utilities, where we start by simulating epsilon for each career choice:
         for j in range(self.par.J):
-            # Simulate ε for each career choice
             epsilons = np.random.normal(0, self.par.sigma**2, self.par.K)
         
-            # Calculate utilities for each draw
+            #From the epsilons found above, we can calculate the utilities using the formula given:
             utilities = self.par.v[j] + epsilons
             
-            # Calculate expected utility
+            #We use np.mean to calculate the mean on the simulated utilities for each career choice, because by the Law of Large Numbers the average of the simulated utilities will converge to the expected utility:
             expected_utilities[j] = np.mean(utilities)
             
-            # Calculate average realized utility
+            #We calculate the average realized utility which theoretically should be equal to the simulated expected utility:
             average_realized_utilities[j] = self.par.v[j] + np.mean(epsilons)
 
-        # Print results
         for j in range(self.par.J):
             print(f"Career choice {j+1}: Expected Utility = {expected_utilities[j]}, Average Realized Utility = {average_realized_utilities[j]}")
 
@@ -51,9 +49,13 @@ class CareerChoiceModelClass():
                     friends_noise = np.random.normal(0, self.par.sigma**2, Fi)
                     prior_expected_utilities[j] = np.mean(self.par.v_j[j] + friends_noise)
                 personal_noise = np.random.normal(0, self.par.sigma**2, self.par.J)
+                #Next we do the step that each person i chooses the career track with the highest expected utility. We use the np.argmax:
                 chosen_career = np.argmax(prior_expected_utilities)
+                #First we store the chosen career $j^k*_i$ 
                 chosen_careers[i, chosen_career, k] = 1
+                #Next we store the prior expectation of the value of their chosen career:
                 expected_utilities[i, k] = prior_expected_utilities[chosen_career]
+                #Lastly we store the realized value of their chosen career track:
                 realized_utilities[i, k] = self.par.v_j[chosen_career] + personal_noise[chosen_career]
 
         # Calculate averages for plotting:
