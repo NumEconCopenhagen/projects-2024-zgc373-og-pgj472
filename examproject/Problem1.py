@@ -1,10 +1,11 @@
+#We have used the Copilot as permitted as a tool to adjust and correct our code when solving the problem. 
+#We write in the code below the parts where we have mainly copied the code from the Copilot.
+
+#Us writing the code:
 from types import SimpleNamespace
-import matplotlib.pyplot as plt
-from scipy.optimize import root
 from scipy import optimize
 from scipy.optimize import minimize
 from scipy.optimize import minimize_scalar
-import pandas as pd
 import numpy as np
 
 class ProductionEconomyClass:
@@ -41,52 +42,43 @@ class ProductionEconomyClass:
         # We set the wage as numeraire:
         sol.w = 1
 
-
-    #We start by defining all the functions given so we can use them later on: 
-    #We define the optimal labour function for the firms: 
+    #For the following functions we have used the structure from the lecture "Production Economy" and adjust to this problem:
     def optimal_labor_firms(self, pj):
-        """ Calculate optimal labor for a given price """
+        """ Calculate optimal labor for the firms for a given price """
         par = self.par
         return (pj * par.A * par.gamma / par.w) ** (1 / (1 - par.gamma))
 
-    #We define the optimal output function for the firms:
     def optimal_output_firms(self, l_star):
-        """ Calculate optimal output for a given labor """
+        """ Calculate optimal output for the firms for a given labor """
         par = self.par
         return par.A * l_star ** par.gamma
     
-    #We define the implied profits function for the firms:
     def implied_profits_firms(self, pj, l_star):
-        """ Calculate implied profits for a given price and labor """
+        """ Calculate implied profits for the firms for a given price and labor """
         par = self.par
         return (1 - par.gamma) / par.gamma * par.w * l_star
 
-    #We define the consumers optimal consumption functions:
     def optimal_consumption_cs(self, l, p1, p2, pi1, pi2):
-        """ Calculate optimal consumption given labor supply """
+        """ Calculate optimal consumption for the consumers given labor supply """
         par = self.par
         budget = par.w * l + par.T + pi1 + pi2
         c1 = par.alpha * budget / p1
         c2 = (1 - par.alpha) * budget / p2 + par.tau
         return c1, c2
     
-    #We define the utility function for the consumers:
     def utility(self, l, p1, p2):
-        """ Utility function """
+        """ Utility function for the consumers """
         par = self.par
         #We store the optimal values from the functions above:
         l1_star = self.optimal_labor_firms(p1)
         l2_star = self.optimal_labor_firms(p2)
-        y1_star = self.optimal_output_firms(l1_star)
-        y2_star = self.optimal_output_firms(l2_star)
         pi1_star = self.implied_profits_firms(p1, l1_star)
         pi2_star = self.implied_profits_firms(p2, l2_star)
         c1, c2 = self.optimal_consumption_cs(l, p1, p2, pi1_star, pi2_star)
         return np.log(c1 ** par.alpha * c2 ** (1 - par.alpha)) - par.nu * l ** (1 + par.epsilon) / (1 + par.epsilon)
 
-    # We define the optimal labor supply function for the consumers:
     def find_optimal_labor(self, p1, p2):
-        """ Find optimal labor supply by maximizing the utility function """
+        """ Find optimal labor supply by maximizing the utility function for the consumers """
         sol = self.sol
         #We define an objective function to minimize:
         def obj(l):
@@ -103,9 +95,9 @@ class ProductionEconomyClass:
         return sol.l_star
         
     # We evaluate the equilibrium and check the market clearing conditions:
+    #For the next part we used copilot to get it to work: 
     def evaluate_equilibrium(self, p1, p2):
         """ Evaluate equilibrium and check market clearing conditions """
-        sol = self.sol
 
         l_star = self.find_optimal_labor(p1, p2)
         l1_star = self.optimal_labor_firms(p1)
@@ -135,18 +127,19 @@ class ProductionEconomyClass:
             'good2_market_clear': good2_market_clear
         }
 
-    # We check the market clearing conditions for all combinations of p1 and p2 by looping through the ranges given:
+    #Us writing the code:
     def check_market_clearing(self):
-        """ Check market clearing conditions for all combinations of p1 and p2 """
+        """ Check market clearing conditions for all combinations of p1 and p2 by looping through the ranges given """
         par = self.par
         results = []
         market_clearing_found = False 
 
+        #We loop through the ranges given for p1 and p2:
         for p1 in par.p1_range:
             for p2 in par.p2_range:
                 result = self.evaluate_equilibrium(p1, p2)
                 results.append(result)
-                #We check if any market clearing condition is met
+                #We check if any market clearing condition is met:
                 if result['labor_market_clear'] or result['good1_market_clear'] or result['good2_market_clear']:
                     market_clearing_found = True
                     print(f"p1: {result['p1']}, p2: {result['p2']}, "
@@ -159,6 +152,7 @@ class ProductionEconomyClass:
 
         return results
 
+    #Next  part is made with help from Copilot:
     #We calculate the equilibrium prices:
     def find_equilibrium_prices(self):
         #We define the initial guesses for the prices:
@@ -183,6 +177,7 @@ class ProductionEconomyClass:
         else:
             raise RuntimeError("Failed to find equilibrium prices")
 
+    #Us writing the code:
     # We calculate the social welfare function
     def calculate_swf(self, p1, p2):
         equilibrium = self.evaluate_equilibrium(p1, p2)
@@ -191,7 +186,7 @@ class ProductionEconomyClass:
         SWF = U - self.par.kappa * y2_star
         return SWF
 
-    # We optimize the social welfare function
+    # We optimize the social welfare function (used copilot to adjust the code):
     def swf_optimization_objective_with_T(self, params):
         tau, T = params 
         self.par.tau = tau 
@@ -201,6 +196,7 @@ class ProductionEconomyClass:
                 SWF = self.calculate_swf(p1, p2)
                 return -SWF 
 
+    #Us writing the code:
     # We find the optimal value og tau, T and SWF
     def optimize_tau_and_T(self):
         # We set initial guesses for tau and T
