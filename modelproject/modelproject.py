@@ -320,3 +320,6 @@ class monopoly_model_extension(duopoly_model):
         table.add_row(["Producer Surplus", f"{duopoly_model_extension.producer_surplus_duo():.3f}", f"{monopoly_model_extension.producer_surplus_mon():.3f}"])
         
         print(table)
+
+
+#TEST before upload 
