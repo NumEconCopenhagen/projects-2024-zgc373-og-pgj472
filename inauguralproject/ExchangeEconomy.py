@@ -9,7 +9,7 @@ import numpy as np
 
 
 class ExchangeEconomyClass:
-    #Defining parameters:
+    #We define parameters:
     def __init__(self):
 
         par = self.par = SimpleNamespace()
@@ -24,14 +24,14 @@ class ExchangeEconomyClass:
         par.w1B = 0.2
         par.w2B = 0.7
 
-    #Defining utility functions:
+    #We define utility functions:
     def utility_A(self,x1A,x2A):
         return(x1A**self.par.alpha)*x2A**(1-self.par.alpha)
    
     def utility_B(self,x1B,x2B):
         return(x1B**(self.par.beta)*x2B**(1-self.par.beta))
 
-    #Defining demand functions:
+    #We define demand functions:
     def demand_A(self,p1,p2):
         par = self.par
         x1A = par.alpha*((p1*par.w1A+p2*par.w2A)/p1)
@@ -44,7 +44,7 @@ class ExchangeEconomyClass:
         x2B = (1-par.beta)*((p1*(1-par.w1A)+p2*(1-par.w2A))/p2)
         return x1B, x2B
 
-    #Finding market clearing:
+    #We find market clearing:
     def check_market_clearing(self,p1,p2):
         par = self.par
 
@@ -164,25 +164,25 @@ class ExchangeEconomyClass:
         #We use a while loop to find equilibrium price. The loop will run until the excess demand is below the tolerance level or/and the number of iterations reach the maximum number of iterations we have set to 10000.
         while True:
 
-            # 1. excess demand for good 1
+            #excess demand for good 1
             Z1 = self.excess_demand(p1)
            
-            # 2. The iteration stops when the price is close enough to equilibrium or a maximum iteration set to 10000.
+            #The iteration stops when the price is close enough to equilibrium or a maximum iteration set to 10000.
             if  np.abs(Z1) < self.par.eps or t >= self.par.maxiter:   # The first condition compares to the tolerance level and the second condition ensures that the loop does not go to infinity.
                 print(f'{t:3d}: p1 = {p1:12.8f} -> excess demand -> {Z1:14.8f}')
                 self.p1_equilibrium = p1  #We Store the equilibrium price in an instance variable.
                 break    
            
-            # 3. We print the first 5 and every 25th iteration using the modulus operator:
+            #We print the first 5 and every 25th iteration using the modulus operator:
             if t < 5 or t%25 == 0:
                 print(f'{t:3d}: p1 = {p1:12.8f} -> excess demand -> {Z1:14.8f}')
             elif t == 5:
                 print('   ...')
            
-            # 4. We update p1
+            #We update p1
             p1 = p1 + par.kappa*Z1/2    # The price is updated by a small number (kappe) scaled to excess demand divded among the number of consumers, i.e. 2
            
-            # 5. We update the counter and return to step 1
+            #We update the counter and return to step 1
             t += 1    
         
         print("Market clearing price: ", p1)
@@ -400,7 +400,7 @@ class ExchangeEconomyClass:
 
 
     def comparing_results(self):
-        #List of all results to create table: 
+        #We create a list of all results to create table: 
         #Prices:
         p1_q3 = 0.944444460152919
         optimal_p1_q4a = 1.8866666666666667
@@ -440,7 +440,7 @@ class ExchangeEconomyClass:
         x2B_optimal_q5a = 0.1466666666666666
         x2B_optimal_q5b = 0.2749317170143414
     
-        #Creating a table to make comparison easier from question 3-5: 
+        #We create a table to make comparison easier from question 3-5: 
         questions = ['3', '4a', '4b', '5a', '5b']
         prices = [p1_q3, optimal_p1_q4a, optimal_p1_q4b, p1_q5a, p1_q5b]
         utility_A = [utility_A_q3, utility_A_optimal_q4a, utility_A_optimal_q4b, uA_Z, utility_A_optimal_q5b] 
