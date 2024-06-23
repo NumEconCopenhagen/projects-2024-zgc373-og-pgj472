@@ -45,21 +45,19 @@ class BarycentricClass:
                 if dist < min_dist_D:
                     D = point
                     min_dist_D = dist
-        
-        # Print the points if they are not None, otherwise print "Nan"
-        print("A:", A if A is not None else "Nan")
-        print("B:", B if B is not None else "Nan")
-        print("C:", C if C is not None else "Nan")
-        print("D:", D if D is not None else "Nan")
 
         return A, B, C, D
 
     # Function to check if a point is inside a triangle using barycentric coordinates
-    def is_inside_triangle(self, A, B, C, P):
+    def barycentric_coordinates(self, A, B, C, P):
         denom = (B[1] - C[1]) * (A[0] - C[0]) + (C[0] - B[0]) * (A[1] - C[1])
         r1 = ((B[1] - C[1]) * (P[0] - C[0]) + (C[0] - B[0]) * (P[1] - C[1])) / denom
         r2 = ((C[1] - A[1]) * (P[0] - C[0]) + (A[0] - C[0]) * (P[1] - C[1])) / denom
         r3 = 1 - r1 - r2
+        return r1, r2, r3
+
+    def is_inside_triangle(self, A, B, C, P):
+        r1, r2, r3 = self.barycentric_coordinates(A, B, C, P)
         return r1, r2, r3, (0 <= r1 <= 1 and 0 <= r2 <= 1 and 0 <= r3 <= 1)
 
     def interpolate(self):
@@ -103,5 +101,32 @@ class BarycentricClass:
         plt.title('Points and Triangles ABC and CDA')
         plt.show()
 
+    def compute_barycentric_coordinates(self):
+        X = self.par.X
+        y = self.par.y
+        A, B, C, D = self.find_points(X, y)
 
+        if A is None or B is None or C is None or D is None:
+            print("One or more of the points A, B, C, D are None. Cannot compute barycentric coordinates.")
+            return "NaN", "NaN"
+
+        #Computing barycentric coordinates for triangles ABC and CDA with respect to point y:")
+        r_ABC = self.barycentric_coordinates(A, B, C, y)
+        r_CDA = self.barycentric_coordinates(C, D, A, y)
+        
+        print(f"Barycentric coordinates for triangle ABC: {r_ABC}")
+        print(f"Barycentric coordinates for triangle CDA: {r_CDA}")
+
+        inside_ABC = 0 <= r_ABC[0] <= 1 and 0 <= r_ABC[1] <= 1 and 0 <= r_ABC[2] <= 1
+        inside_CDA = 0 <= r_CDA[0] <= 1 and 0 <= r_CDA[1] <= 1 and 0 <= r_CDA[2] <= 1
+
+        if inside_ABC:
+            print("Point y is inside triangle ABC.")
+            return r_ABC, "ABC"
+        elif inside_CDA:
+            print("Point y is inside triangle CDA.")
+            return r_CDA, "CDA"
+        else:
+            print("Point y is not inside triangles ABC or CDA.")
+            return "NaN", "NaN"
 
